@@ -11,6 +11,7 @@ from src.models.schemas import CharacterName
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
 
+
 def create_access_token(data: dict, expires_delta = timedelta(minutes=30)):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
@@ -18,36 +19,36 @@ def create_access_token(data: dict, expires_delta = timedelta(minutes=30)):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-def get_current_character_username(token: Annotated[str, Depends(oauth2_scheme)]):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        jwt_character_username: str = payload.get("sub")
-        if jwt_character_username is None:
-            raise credentials_exception
-        token_data = CharacterName(username=jwt_character_username)
-    except JWTError:
-        raise credentials_exception
-    return token_data
 
-def get_current_character(token: Annotated[str, Depends(oauth2_scheme)]):
+def decode_jwt_token_sub(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         jwt_character_username: str = payload.get("sub")
         if jwt_character_username is None:
             raise credentials_exception
-        character_name = CharacterName(username=jwt_character_username)
+        return CharacterName(username=jwt_character_username)
     except JWTError:
         raise credentials_exception
+
+
+def get_current_character_username(token: str = Depends(oauth2_scheme)):
+    character_name = decode_jwt_token_sub(token)
+    return character_name
+
+
+def get_current_character(character_name: CharacterName = Depends(get_current_character_username)):
     character = get_character(username=character_name.username)
     if character is None:
         raise credentials_exception
     return character
+
 
 def authenticate_character(username: str, password: str):
     character = get_character(username)
