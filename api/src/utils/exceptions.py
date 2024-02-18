@@ -1,2 +1,3 @@
-class MaxMapLevelReached(Exception):
+class DeadOrWinner(Exception):
     pass
+

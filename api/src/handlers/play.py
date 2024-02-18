@@ -3,16 +3,16 @@ from sqlalchemy import desc
 from src.models.models import Character, Quest
 from src.models.schemas import CharacterGameData, ChosenApproach, Approach
 import random
-from src.utils.exceptions import MaxMapLevelReached
+from src.utils.exceptions import DeadOrWinner
 
 def roll_handler(current_character_game_data: CharacterGameData, chosen_approach: ChosenApproach, db: Session):
     
     
-    if current_character_game_data.map_level >= 10:
-        raise MaxMapLevelReached(
-            "Can't play anymore. Your character's journey came to an end after exploring the whole world and being victorious."
-            )
-    
+    if current_character_game_data.char_state == 'dead' or current_character_game_data.char_state == 'winner':
+        raise DeadOrWinner(
+                """Can't play anymore. Your character's either dead or yourjourney came
+                to an end after exploring the whole world and coming victorious."""
+                )
     
     dice_roll = random.randint(1, 100)
     #get latest quest on db, meaning, the one we just created

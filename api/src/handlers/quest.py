@@ -6,13 +6,14 @@ import json
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from src.utils.prompt import create_quest_prompt, prompt_maps
-from src.utils.exceptions import MaxMapLevelReached
+from src.utils.exceptions import DeadOrWinner
 
 async def create_quest_handler(current_character_game_data: CharacterGameData, db: Session):
-  
-  if current_character_game_data.map_level >= 10:
-    raise MaxMapLevelReached(
-            "Can't play anymore. Your character's journey came to an end after exploring the whole world and coming victorious."
+  print(current_character_game_data)
+  if current_character_game_data.char_state == 'dead' or current_character_game_data.char_state == 'winner':
+    raise DeadOrWinner(
+            """Can't play anymore. Your character's either dead or yourjourney came
+            to an end after exploring the whole world and coming victorious."""
             )
     
   map = prompt_maps[current_character_game_data.map_level]
