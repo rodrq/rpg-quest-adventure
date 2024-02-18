@@ -1,9 +1,16 @@
 from sqlalchemy.orm import Session
 from src.models.models import Character, Quest
-from src.models.schemas import CharacterRollData, ChosenApproach, Approach
+from src.models.schemas import CharacterGameData, ChosenApproach, Approach
 import random
+from src.utils.exceptions import MaxMapLevelReached
 
-def roll_handler(current_character_game_data: CharacterRollData, chosen_approach: ChosenApproach, db: Session):
+def roll_handler(current_character_game_data: CharacterGameData, chosen_approach: ChosenApproach, db: Session):
+    
+    if current_character_game_data.map_level >= 10:
+        raise MaxMapLevelReached(
+            "Can't play anymore. Your character's journey came to an end after exploring the whole world and being victorious."
+            )
+    
     dice_roll = random.randint(1, 100)
     
     quest = db.query(Quest).filter(Quest.quest_id == chosen_approach.quest_id).first()
@@ -29,7 +36,7 @@ def roll_handler(current_character_game_data: CharacterRollData, chosen_approach
             return roll_failure_handler(current_character_game_data, approach.failure_description, db)
 
 
-def roll_success_handler(current_character: CharacterRollData, honor_gained, game_success_description, db: Session):
+def roll_success_handler(current_character: CharacterGameData, honor_gained, game_success_description, db: Session):
     character = db.query(Character).filter(Character.username == current_character.username).first()
     if character:
         new_map_level = character.map_level + 1
@@ -47,7 +54,7 @@ def roll_success_handler(current_character: CharacterRollData, honor_gained, gam
         db.commit()
         return {'message':f'{game_success_description} You can continue your adventure'}
     
-def roll_failure_handler(current_character: CharacterRollData, game_failure_description, db: Session):
+def roll_failure_handler(current_character: CharacterGameData, game_failure_description, db: Session):
     db.query(Character).filter(Character.username == current_character.username).update({Character.char_state: 'dead'})
     db.commit()
     return {'message': f'{game_failure_description} You died.' }

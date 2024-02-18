@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from src.handlers.quest import create_quest_handler, get_quests_handler, get_quest_handler
-from src.models.schemas import CharacterName, CharacterParams
+from src.models.schemas import CharacterName, CharacterGameData
 from typing import Annotated
 from src.utils.auth import get_current_character, get_current_character_username
 from src.config.database import get_db
@@ -11,15 +11,10 @@ router = APIRouter(prefix='/quest',
 
 
 @router.post("/")
-async def create_quest(current_character: Annotated[CharacterParams, Depends(get_current_character)],
+async def create_quest(current_character_game_data: Annotated[CharacterGameData, Depends(get_current_character)],
                        db: Session = Depends(get_db)):
     
-    return await create_quest_handler(username = current_character.username, 
-                                         class_= current_character.class_,
-                                         map_level = current_character.map_level,
-                                         virtue = current_character.virtue,
-                                         flaw= current_character.flaw,
-                                         db=db)
+    return await create_quest_handler(current_character_game_data, db=db)
 
 
 @router.get("/all")

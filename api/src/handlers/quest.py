@@ -1,17 +1,27 @@
 from sqlalchemy.orm import Session
 from src.models.models import Quest
-from src.models.schemas import CharacterName
+from src.models.schemas import CharacterName, CharacterGameData
 from src.config.open_ai_model import openai_client
 import json
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from src.utils.prompt import create_quest_prompt, prompt_maps
+from src.utils.exceptions import MaxMapLevelReached
 
-async def create_quest_handler(username, class_, map_level, virtue, flaw, db: Session):
+async def create_quest_handler(current_character_game_data: CharacterGameData, db: Session):
   
-  map = prompt_maps[map_level]
+  if current_character_game_data.map_level >= 10:
+    raise MaxMapLevelReached(
+            "Can't play anymore. Your character's journey came to an end after exploring the whole world and coming victorious."
+            )
+    
+  map = prompt_maps[current_character_game_data.map_level]
   try:
-    system_prompt, user_prompt = create_quest_prompt(username, class_, map, virtue, flaw)
+    system_prompt, user_prompt = create_quest_prompt(current_character_game_data.username,
+                                                     current_character_game_data.class_,
+                                                     map, 
+                                                     current_character_game_data.virtue, 
+                                                     current_character_game_data.flaw)
     completion = openai_client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[
@@ -29,7 +39,7 @@ async def create_quest_handler(username, class_, map_level, virtue, flaw, db: Se
     quest = Quest(
         title=result['title'],
         description=result['description'],
-        character_username=username,
+        character_username=current_character_game_data.username,
         approaches=result['approaches'],
         cost = cost
     ) 

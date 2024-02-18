@@ -1,0 +1,2 @@
+class MaxMapLevelReached(Exception):
+    pass
