@@ -9,18 +9,20 @@ from src.utils.prompt import create_quest_prompt, prompt_maps
 from src.utils.exceptions import DeadOrWinner
 
 async def create_quest_handler(current_character_game_data: CharacterGameData, db: Session):
-  print(current_character_game_data)
-  if current_character_game_data.char_state == 'dead' or current_character_game_data.char_state == 'winner':
-    raise DeadOrWinner(
-            """Can't play anymore. Your character's either dead or yourjourney came
-            to an end after exploring the whole world and coming victorious."""
-            )
-    
-  map = prompt_maps[current_character_game_data.map_level]
+
   try:
+    
+    if current_character_game_data.char_state == 'dead' or current_character_game_data.char_state == 'winner':
+      raise DeadOrWinner(
+              """Can't play anymore. Your character's either dead or yourjourney came
+              to an end after exploring the whole world and coming victorious."""
+              )
+    
+    quest_map = prompt_maps[current_character_game_data.map_level]
+    
     system_prompt, user_prompt = create_quest_prompt(current_character_game_data.username,
                                                      current_character_game_data.class_,
-                                                     map, 
+                                                     quest_map, 
                                                      current_character_game_data.virtue, 
                                                      current_character_game_data.flaw)
     completion = openai_client.chat.completions.create(
@@ -55,17 +57,24 @@ async def create_quest_handler(current_character_game_data: CharacterGameData, d
   
        
 async def get_quests_handler(params: CharacterName, db: Session):
-  quests = db.query(Quest).filter(Quest.character_username == params.username).all()
-  if not quests:
-    raise HTTPException(status_code=404, detail=f"{params.username} didn't generate any quest yet.")
-  quests_dict = [quest.__dict__ for quest in quests]
-  return quests_dict
+  try:
+    quests = db.query(Quest).filter(Quest.character_username == params.username).all()
+    if not quests:
+      raise HTTPException(status_code=404, detail=f"{params.username} didn't generate any quest yet.")
+    quests_dict = [quest.__dict__ for quest in quests]
+    return quests_dict
+  except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 async def get_quest_handler(current_character_username, quest_id, db: Session):
+    try:
+        quest = db.query(Quest).filter_by(quest_id=quest_id, character_username=current_character_username).first()
+        if not quest:
+          raise HTTPException(status_code=401, detail="Invalid credentials")
+        return quest
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-      quest = db.query(Quest).filter_by(quest_id=quest_id, character_username=current_character_username).first()
-      if not quest:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-      return quest
 
   
