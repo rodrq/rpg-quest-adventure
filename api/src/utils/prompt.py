@@ -16,7 +16,8 @@ def create_quest_prompt(username: str, class_: str, map: str, virtue:str, flaw:s
                                 'chance_of_success': an integer representing the chance % of success.
 
                         Additionally, the player will provide information about themselves,
-                        which should be used to make the quest more personalized."""
+                        which should be used to make the quest more personalized.
+                        The bolder the approach, the lesser the 'chance_of_success'"""
                     
     user_prompt = f""""Hello gamemaster, My name is {username} and I'm a {class_}. I'm currently in the {map}. 
                         My virtue is {virtue}, and my flaw is {flaw}"""
