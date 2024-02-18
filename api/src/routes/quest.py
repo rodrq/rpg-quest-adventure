@@ -18,16 +18,16 @@ async def create_quest(current_character_game_data: Annotated[CharacterGameData,
 
 
 @router.get("/all")
-async def get_quests(current_character_id: Annotated[CharacterName, Depends(get_current_character_username)],
+async def get_quests(current_character_username: Annotated[CharacterName, Depends(get_current_character_username)],
                      db: Session = Depends(get_db)):
     
-    return await get_quests_handler(current_character_id, db)
+    return await get_quests_handler(current_character_username, db)
 
 
 @router.get("/{quest_id}")
 async def get_quest(quest_id: int,
-                    current_character_id: Annotated[CharacterName, Depends(get_current_character_username)],
+                    current_character_username: Annotated[CharacterName, Depends(get_current_character_username)],
                     db: Session = Depends(get_db)):
     
-    return await get_quest_handler(current_character_id.username, quest_id, db)
+    return await get_quest_handler(current_character_username.username, quest_id, db)
     

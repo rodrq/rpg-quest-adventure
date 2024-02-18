@@ -60,9 +60,9 @@ async def get_quests_handler(params: CharacterName, db: Session):
   quests_dict = [quest.__dict__ for quest in quests]
   return quests_dict
 
-async def get_quest_handler(current_character_id, quest_id, db: Session):
+async def get_quest_handler(current_character_username, quest_id, db: Session):
 
-      quest = db.query(Quest).filter_by(quest_id=quest_id, character_username=current_character_id).first()
+      quest = db.query(Quest).filter_by(quest_id=quest_id, character_username=current_character_username).first()
       if not quest:
         raise HTTPException(status_code=401, detail="Invalid credentials")
       return quest
