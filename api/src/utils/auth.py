@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from src.config.settings import SECRET_KEY, ALGORITHM
 from typing import Annotated
 from src.models.schemas import CharacterName
-
+from src.models.models import Character
+from src.models.enums import UserRole
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
 
@@ -67,3 +68,12 @@ def check_token(token: Annotated[str, Depends(oauth2_scheme)]):
             detail='Token is incorrect',
             headers={"WWW-Authenticate": "Bearer"},
         )
+        
+        
+def get_current_admin_user(current_user: Character = Depends(get_current_character)):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this resource",
+        )
+    return current_user
