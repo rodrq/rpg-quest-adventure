@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.config.database import get_db
-from src.models.schemas import CharacterInDb, CharacterName, CharacterGameData
+from src.models.schemas import CharacterInDb, CharacterName
 
 from src.models.models import Character
 
@@ -15,8 +15,9 @@ router = APIRouter(prefix='/character',
 async def create_character(params: CharacterInDb, db: Session = Depends(get_db)):
     return await create_character_handler(params, db)
     
-@router.get('/', response_model=CharacterGameData)
+@router.get('/')
 async def get_character(username: CharacterName, db: Session = Depends(get_db)):
+    ###TODO ADMIN ONLY
     character = db.query(Character).filter(Character.username == username.username).first()
     return character
 

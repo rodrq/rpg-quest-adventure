@@ -5,22 +5,11 @@ from src.config.open_ai_model import openai_client
 import json
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
-from src.utils.prompt import create_quest_prompt
+from src.utils.prompt import create_quest_prompt, prompt_maps
 
 async def create_quest_handler(username, class_, map_level, virtue, flaw, db: Session):
-  maps = {
-    1:'Farm village',
-    2:'River',
-    3:'Abandoned castle',
-    4:'Catacombs',
-    5:'Sewage',
-    6:'Plage-ridden town',
-    7:'Hills',
-    8:'Snowy mountain',
-    9:'Dwarf city',
-    10:"Dwarf king's hall",
-  }
-  map = maps[map_level]
+  
+  map = prompt_maps[map_level]
   try:
     system_prompt, user_prompt = create_quest_prompt(username, class_, map, virtue, flaw)
     completion = openai_client.chat.completions.create(

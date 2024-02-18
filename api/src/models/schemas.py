@@ -25,11 +25,9 @@ class Approach(BaseModel):
     chance_of_success: int
 
     
-class CharacterGameData(BaseModel):
+class CharacterRollData(BaseModel):
     username: str
     class_: str
-    virtue: str
-    flaw: str
     honor_points: int
     map_level: int
     char_state: str
