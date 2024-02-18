@@ -15,11 +15,6 @@ router = APIRouter(prefix='/character',
 async def create_character(params: CharacterInDb, db: Session = Depends(get_db)):
     return await create_character_handler(params, db)
     
-@router.get('/')
-async def get_character(username: CharacterName, db: Session = Depends(get_db)):
-    ###TODO ADMIN ONLY
-    character = db.query(Character).filter(Character.username == username.username).first()
-    return character
 
     
 @router.delete('/delete')

@@ -4,7 +4,10 @@ class CharacterStateEnum(enum.Enum):
     dead = 'dead'
     winner = 'winner'
     adventuring = 'adventuring'
-    
+
+class UserRole(str, enum.Enum):
+    user = "user"
+    admin = "admin"   
     
 class CharacterClassesEnum(enum.Enum):
     warrior = 'warrior'
