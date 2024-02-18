@@ -18,14 +18,21 @@ class CharacterName(BaseModel):
     username: str
 
 class ChosenApproach(BaseModel):
-    approach_id: int
-  
+    quest_id: int
+    approach_number: int
+
+class Approach(BaseModel):
+    choice_description: str
+    success_description: str
+    failure_description: str
+    chance_of_success: int
+
+    
 class CharacterResponse(BaseModel):
     username: str
     class_: str
     virtue: str
     flaw: str
-    honor_points: str
-    map_level: str
-    is_dead: bool
-    is_winner: bool
+    honor_points: int
+    map_level: int
+    char_state: str

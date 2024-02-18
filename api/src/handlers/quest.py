@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from src.models.models import Quest, Approach
+from src.models.models import Quest
 from src.models.schemas import CharacterName
 from src.config.open_ai_model import openai_client
 import json
@@ -41,18 +41,9 @@ async def create_quest_handler(username, class_, map_level, virtue, flaw, db: Se
         title=result['title'],
         description=result['description'],
         character_username=username,
+        approaches=result['approaches'],
         cost = cost
     ) 
-    for approach_name in result['approaches']:
-      approach = Approach(
-        choice_description=result['approaches'][approach_name]['choice_description'],
-          success_description=result['approaches'][approach_name]['success_description'],
-          failure_description=result['approaches'][approach_name]['failure_description'],
-          chance_of_success=result['approaches'][approach_name]['chance_of_success']
-        )
-    
-      quest.approaches.append(approach)
-    
 
     print(quest)
     db.add(quest)

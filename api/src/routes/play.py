@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from src.config.database import get_db
 from sqlalchemy.orm import Session
-from src.models.schemas import ChosenApproach
-from src.models.models import Approach, Quest
+from src.models.schemas import ChosenApproach, Approach
+from src.models.models import Quest
 from src.utils.auth import get_current_character_id
 from typing import Annotated
 from src.handlers.play import roll_success_handler, roll_failure_handler
@@ -15,16 +15,23 @@ router = APIRouter(prefix='/play', tags=['Play'])
 async def roll_and_game(current_character: Annotated[str, Depends(get_current_character_id)],
                          chosen_approach: ChosenApproach, db: Session = Depends(get_db)):
     dice_roll = random.randint(1, 100)
-    approach = db.query(Approach).filter(Approach.approach_id == chosen_approach.approach_id).first()
-    chance_of_success = approach.chance_of_success
-    if dice_roll < chance_of_success:
-        honor_gained = (100 - chance_of_success) * 10
-        return roll_success_handler(honor_gained, current_character, db)
-    else:
-        return roll_failure_handler(current_character, db)
-    
-    
-# @router.get('/approach/{quest_id}')
-# async def get_approaches(quest_id: int, current_character: str = Depends(get_current_character_id), db: Session = Depends(get_db)):
-#     approaches = db.query(Approach).filter(Approach.quest_id == quest_id).all()
-#     return approaches
+    quest = db.query(Quest).filter(Quest.quest_id == chosen_approach.quest_id).first()
+    if quest:
+        try:
+            #ADD APPROACH_NUMBER VALIDATION 1 TO 3
+            approach = quest.approaches[f'approach_{chosen_approach.approach_number}']
+        except:
+            raise ValueError(f"Approach {chosen_approach.approach_number} not found for the quest.")
+        
+        approach = Approach(choice_description=approach['choice_description'],
+                            success_description=approach['success_description'],
+                            failure_description=approach['failure_description'],
+                            chance_of_success=approach['chance_of_success'])
+        chance_of_success = approach.chance_of_success
+        if dice_roll < chance_of_success:
+            honor_gained = (100 - chance_of_success) * 10
+            return roll_success_handler(honor_gained, current_character, db)
+        else:
+            return roll_failure_handler(current_character, db)
+
+
