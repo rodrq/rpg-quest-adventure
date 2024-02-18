@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 from src.models.models import Character, Quest
 from src.models.schemas import CharacterGameData, ChosenApproach, Approach
 import random
@@ -6,16 +7,18 @@ from src.utils.exceptions import MaxMapLevelReached
 
 def roll_handler(current_character_game_data: CharacterGameData, chosen_approach: ChosenApproach, db: Session):
     
+    
     if current_character_game_data.map_level >= 10:
         raise MaxMapLevelReached(
             "Can't play anymore. Your character's journey came to an end after exploring the whole world and being victorious."
             )
     
-    dice_roll = random.randint(1, 100)
     
-    quest = db.query(Quest).filter(Quest.quest_id == chosen_approach.quest_id).first()
+    dice_roll = random.randint(1, 100)
+    #get latest quest on db, meaning, the one we just created
+    quest = db.query(Quest).order_by(desc(Quest.quest_id)).first()
 
-    if quest:
+    if quest and quest.selected_approach==None:
         try:
             #TODO: ADD APPROACH_NUMBER VALIDATION 1 TO 3
             approach = quest.approaches[f'approach_{chosen_approach.approach_number}']
@@ -26,6 +29,10 @@ def roll_handler(current_character_game_data: CharacterGameData, chosen_approach
                             success_description=approach['success_description'],
                             failure_description=approach['failure_description'],
                             chance_of_success=approach['chance_of_success'])
+        
+        #save aproach to quest table
+        if approach:
+            quest.selected_approach = chosen_approach.approach_number
         
         chance_of_success = approach.chance_of_success
         

@@ -15,7 +15,6 @@ class CharacterName(BaseModel):
     username: str
 
 class ChosenApproach(BaseModel):
-    quest_id: int
     approach_number: int
 
 class Approach(BaseModel):
