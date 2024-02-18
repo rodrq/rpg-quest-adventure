@@ -24,7 +24,7 @@ credentials_exception = HTTPException(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-def get_current_character_id(token: Annotated[str, Depends(oauth2_scheme)]):
+def get_current_character_username(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         jwt_character_username: str = payload.get("sub")

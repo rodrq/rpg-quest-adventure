@@ -3,7 +3,7 @@ from src.config.database import get_db
 from sqlalchemy.orm import Session
 from src.models.schemas import ChosenApproach, Approach
 from src.models.models import Quest
-from src.utils.auth import get_current_character_id
+from src.utils.auth import get_current_character_username
 from typing import Annotated
 from src.handlers.play import roll_success_handler, roll_failure_handler
 import random
@@ -12,7 +12,7 @@ router = APIRouter(prefix='/play', tags=['Play'])
 
 
 @router.post('/roll')
-async def roll_and_game(current_character: Annotated[str, Depends(get_current_character_id)],
+async def roll_and_game(current_character: Annotated[str, Depends(get_current_character_username)],
                          chosen_approach: ChosenApproach, db: Session = Depends(get_db)):
     dice_roll = random.randint(1, 100)
     quest = db.query(Quest).filter(Quest.quest_id == chosen_approach.quest_id).first()
