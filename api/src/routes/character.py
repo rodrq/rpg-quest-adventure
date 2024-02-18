@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from src.config.database import get_db
 from src.models.schemas import CharacterInDb, CharacterName, CharacterResponse
 
@@ -27,6 +27,15 @@ async def get_character(username: CharacterName, db: Session = Depends(get_db)):
                              honor_points=character.honor_points,
                              virtue=character.virtue,
                              flaw=character.flaw,
-                             is_dead=character.is_dead,
-                             is_winner=character.is_winner
+                             char_state=character.char_state
                             )
+    
+@router.delete('/delete')
+async def delete_character(username: CharacterName, db: Session = Depends(get_db)):
+    character = db.query(Character).filter(Character.username == username.username).first()
+    if character:
+        db.delete(character)
+        db.commit()
+        return {"message": "Character deleted successfully"}
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Character not found")

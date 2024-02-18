@@ -8,20 +8,22 @@ from fastapi.responses import JSONResponse
 from src.utils.auth import create_access_token
 
 
-async def create_character_handler(params: CharacterInDb, db: Session):
+async def create_character_handler(create_character_params: CharacterInDb, db: Session):
     try:
-        if get_character(params.username):
+        if get_character(create_character_params.username):
                 raise HTTPException(status_code=400, detail="Character username already exists")
         character = Character(
-            username=params.username,
-            password=get_hashed_password(params.password),
-            class_=params.class_
+            username=create_character_params.username,
+            password=get_hashed_password(create_character_params.password),
+            class_=create_character_params.class_,
+            virtue = create_character_params.virtue,
+            flaw = create_character_params.flaw
         )
           
         db.add(character)
         db.commit()
 
-        token_data = {"sub": params.username}
+        token_data = {"sub": create_character_params.username}
         access_token = create_access_token(token_data)
         
         response = JSONResponse(content={"message": "Created character"})
