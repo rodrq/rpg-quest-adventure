@@ -6,7 +6,7 @@ from src.utils.pw_hash import verify_password
 from datetime import datetime, timedelta
 from src.config.settings import SECRET_KEY, ALGORITHM
 from typing import Annotated
-from src.models.schemas import TokenData
+from src.models.schemas import CharacterName
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
@@ -30,7 +30,7 @@ def get_current_character_username(token: Annotated[str, Depends(oauth2_scheme)]
         jwt_character_username: str = payload.get("sub")
         if jwt_character_username is None:
             raise credentials_exception
-        token_data = TokenData(username=jwt_character_username)
+        token_data = CharacterName(username=jwt_character_username)
     except JWTError:
         raise credentials_exception
     return token_data
@@ -41,10 +41,10 @@ def get_current_character(token: Annotated[str, Depends(oauth2_scheme)]):
         jwt_character_username: str = payload.get("sub")
         if jwt_character_username is None:
             raise credentials_exception
-        token_data = TokenData(username=jwt_character_username)
+        character_name = CharacterName(username=jwt_character_username)
     except JWTError:
         raise credentials_exception
-    character = get_character(username=token_data.username)
+    character = get_character(username=character_name.username)
     if character is None:
         raise credentials_exception
     return character

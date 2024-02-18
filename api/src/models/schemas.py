@@ -1,9 +1,6 @@
 from pydantic import BaseModel
-from typing import Union
 
 
-class TokenData(BaseModel):
-    username: Union[str, None] = None
     
 class CharacterParams(BaseModel):
     username: str
@@ -28,7 +25,7 @@ class Approach(BaseModel):
     chance_of_success: int
 
     
-class CharacterResponse(BaseModel):
+class CharacterGameData(BaseModel):
     username: str
     class_: str
     virtue: str
