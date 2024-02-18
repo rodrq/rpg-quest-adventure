@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: rpg
+      POSTGRES_USER: rodrq
+      POSTGRES_PASSWORD: rodrq
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432

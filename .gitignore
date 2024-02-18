@@ -1,0 +1,10 @@
+venv
+todo.md
+.env
+test.py
+__pycache__
+data
+test
+Dockerfile
+.dockerignore
+api/fly.toml
