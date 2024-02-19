@@ -10,18 +10,18 @@ def roll_handler(current_character_game_data: CharacterGameData, chosen_approach
     try:
         if current_character_game_data.char_state == 'dead' or current_character_game_data.char_state == 'winner':
             raise DeadOrWinner(
-                    """Can't play anymore. Your character's either dead or yourjourney came
+                    """Can't play anymore. Your character's either dead or your journey came
                     to an end after exploring the whole world and coming victorious."""
                     )
         
 
         #get latest quest on db, meaning, the one we just created
-        quest = db.query(Quest).order_by(desc(Quest.quest_id)).first()
+        current_quest = db.query(Quest).order_by(desc(Quest.quest_id)).first()
 
-        if quest and quest.selected_approach==None:
+        if current_quest and current_quest.selected_approach==None:
             try:
                 #TODO: ADD APPROACH_NUMBER VALIDATION 1 TO 3
-                approach = quest.approaches[f'approach_{chosen_approach.approach_number}']
+                approach = current_quest.approaches[f'approach_{chosen_approach.approach_number}']
             except:
                 raise ValueError(f"Approach {chosen_approach.approach_number} not found for the quest.")
             
@@ -32,7 +32,7 @@ def roll_handler(current_character_game_data: CharacterGameData, chosen_approach
             
             #save aproach to quest table
             if approach:
-                quest.selected_approach = chosen_approach.approach_number
+                current_quest.selected_approach = chosen_approach.approach_number
             
             #Every 200 honor, 1% more chance per approach 
             gamey_chance_of_success = approach.chance_of_success + (current_character_game_data.honor_points/200)
