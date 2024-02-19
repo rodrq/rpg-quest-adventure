@@ -11,7 +11,7 @@ from src.utils.exceptions import DeadOrWinner
 async def create_quest_handler(current_character_game_data: CharacterGameData, db: Session):
 
   try:
-    
+    #TODO make this a dependency
     if current_character_game_data.char_state == 'dead' or current_character_game_data.char_state == 'winner':
       raise DeadOrWinner(
               """Can't play anymore. Your character's either dead or yourjourney came
