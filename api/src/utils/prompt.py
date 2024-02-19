@@ -29,7 +29,7 @@ prompt_maps = {
     3:'Abandoned castle',
     4:'Catacombs',
     5:'Sewage',
-    6:'Plage-ridden town',
+    6:'Plague-ridden town',
     7:'Hills',
     8:'Snowy mountain',
     9:'Dwarf city',
