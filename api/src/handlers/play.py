@@ -73,3 +73,23 @@ def roll_failure_handler(current_character: CharacterGameData, game_failure_desc
         return {'message': f'{game_failure_description} You died.' }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+def reset_character_handler(current_character_game_data: CharacterGameData, db:Session):
+    
+    character = db.query(Character).filter(Character.username == current_character_game_data.username).first()
+    print(character.char_state)
+    if character:
+        new_map_level = 1
+        new_honor_points = 0
+        new_char_state = 'adventuring'
+        update_values = {
+            Character.map_level: new_map_level,
+            Character.honor_points: new_honor_points,
+            Character.char_state: new_char_state
+        }
+        db.query(Character).filter(Character.username == character.username).update(update_values)
+        db.commit()
+    character = db.query(Character).filter(Character.username == current_character_game_data.username).first()
+    print(character.char_state)
+    
+    return {'message': 'Character reset.' }
