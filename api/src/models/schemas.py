@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, validator
 
 
     
@@ -16,6 +16,12 @@ class CharacterName(BaseModel):
 
 class ChosenApproach(BaseModel):
     approach_number: int
+    
+    @validator("approach_number")
+    def validate_approach_number(cls, value):
+        if value < 1 or value > 3:
+            raise ValueError("Approach number must be between 1 and 3")
+        return value
 
 class Approach(BaseModel):
     choice_description: str

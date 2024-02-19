@@ -20,7 +20,6 @@ def roll_handler(current_character_game_data: CharacterGameData, chosen_approach
 
         if current_quest and current_quest.selected_approach==None:
             try:
-                #TODO: ADD APPROACH_NUMBER VALIDATION 1 TO 3
                 approach = current_quest.approaches[f'approach_{chosen_approach.approach_number}']
             except:
                 raise ValueError(f"Approach {chosen_approach.approach_number} not found for the quest.")
