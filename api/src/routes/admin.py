@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from src.utils.auth import get_current_admin_user
 from src.config.database import get_db
 from src.models.models import Character, Quest
@@ -36,3 +36,15 @@ async def get_characters(current_admin_user: Character = Depends(get_current_adm
     
     characters = db.query(Character).all()
     return characters
+
+@router.delete('/delete_character')
+async def delete_character(username: CharacterName,
+                           db: Session = Depends(get_db),
+                           current_admin_user: Character = Depends(get_current_admin_user)):
+    character = db.query(Character).filter(Character.username == username.username).first()
+    if character:
+        db.delete(character)
+        db.commit()
+        return {"message": "Character deleted successfully"}
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Character not found")

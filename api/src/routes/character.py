@@ -17,12 +17,3 @@ async def create_character(params: CharacterInDb, db: Session = Depends(get_db))
     
 
     
-@router.delete('/delete')
-async def delete_character(username: CharacterName, db: Session = Depends(get_db)):
-    character = db.query(Character).filter(Character.username == username.username).first()
-    if character:
-        db.delete(character)
-        db.commit()
-        return {"message": "Character deleted successfully"}
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Character not found")
