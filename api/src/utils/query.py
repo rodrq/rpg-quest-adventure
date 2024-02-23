@@ -1,14 +1,10 @@
 from sqlalchemy.orm import Session
-from src.config.database import engine
+from src.config.database import get_db
 from sqlalchemy import func
 from src.models.models import Character
-
-def db_query_value(table, column, value):
-    with Session(engine) as session:
-            queried_value = session.query(table).filter(column == value).first()
-            return queried_value
+from fastapi import Depends, HTTPException, status
             
-def get_character(username: str):
-    with Session(engine) as session:
-            queried_character = session.query(Character).filter(func.lower(Character.username) == username.lower()).first()
-            return queried_character
+def get_character_query(username: str, db: Session):
+    
+    queried_character = db.query(Character).filter(func.lower(Character.username) == username.lower()).first()
+    return queried_character

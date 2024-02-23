@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from src.utils.query import get_character
+from src.utils.query import get_character_query
 from src.utils.pw_hash import verify_password
 from datetime import datetime, timedelta
 from src.config.settings import SECRET_KEY, ALGORITHM
@@ -9,6 +9,9 @@ from typing import Annotated
 from src.models.schemas import CharacterName
 from src.models.models import Character
 from src.models.enums import UserRole
+from sqlalchemy.orm import Session
+
+from src.config.database import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
 
@@ -44,15 +47,15 @@ def get_current_character_username(token: str = Depends(oauth2_scheme)):
     return character_name
 
 
-def get_current_character(character_name: CharacterName = Depends(get_current_character_username)):
-    character = get_character(username=character_name.username)
+def get_current_character(character_name: CharacterName = Depends(get_current_character_username), db: Session = Depends(get_db)):
+    character = get_character_query(username=character_name.username, db = db)
     if character is None:
         raise credentials_exception
     return character
 
 
-def authenticate_character(username: str, password: str):
-    character = get_character(username)
+def authenticate_character(username: str, password: str, db: Session):
+    character = get_character_query(username, db)
     if not character or not verify_password(password, character.password):
         return None
     return character

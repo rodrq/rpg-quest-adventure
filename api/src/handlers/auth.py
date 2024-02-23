@@ -4,10 +4,11 @@ from src.utils.auth import authenticate_character, create_access_token
 from fastapi.responses import JSONResponse
 from datetime import timedelta
 from src.config.settings import TOKEN_LIFETIME_MINUTES
+from sqlalchemy.orm import Session
 
-def login_for_access_token_handler(form_data: OAuth2PasswordRequestForm):
+def login_for_access_token_handler(form_data: OAuth2PasswordRequestForm, db: Session):
     try:
-        user = authenticate_character(form_data.username, form_data.password)
+        user = authenticate_character(form_data.username, form_data.password, db)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
