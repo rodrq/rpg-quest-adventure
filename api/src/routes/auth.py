@@ -23,7 +23,4 @@ async def logout(response: Response):
     response.delete_cookie("token")
     return response
 
-@router.get("/is_logged")
-async def check_login(token_check: Annotated[bool, Depends(check_token)]):
-    return token_check
     
