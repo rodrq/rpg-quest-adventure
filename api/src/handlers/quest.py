@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from src.models.models import Quest
-from src.models.schemas import CharacterName, CharacterGameData
+from src.models.serializers import CharacterName, CharacterGameData
 from src.config.open_ai_model import openai_client
 import json
 from fastapi.responses import JSONResponse

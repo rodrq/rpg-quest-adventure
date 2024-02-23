@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from src.config.database import get_db
 from sqlalchemy.orm import Session
 from src.models.models import Character
-from src.models.schemas import ChosenApproach
+from src.models.serializers import ChosenApproach
 from src.utils.auth import get_current_character
 from typing import Annotated
 from src.handlers.play import roll_handler, reset_character_handler

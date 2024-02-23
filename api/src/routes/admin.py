@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.utils.auth import get_current_admin_user
 from src.config.database import get_db
 from src.models.models import Character, Quest
-from src.models.schemas import CharacterName
+from src.models.serializers import CharacterName
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix='/admin',

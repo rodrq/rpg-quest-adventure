@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from src.handlers.quest import create_quest_handler, get_quests_handler, get_quest_handler
-from src.models.schemas import CharacterName, CharacterGameData
+from src.models.serializers import CharacterName, CharacterGameData
 from typing import Annotated
 from src.utils.auth import get_current_character, get_current_character_username
 from src.config.database import get_db
