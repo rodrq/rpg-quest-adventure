@@ -26,7 +26,9 @@ async def get_quest(quest_id: int,
     return quest
     
 @router.get('/get_character/{character_name}')
-async def get_character(character_name: str, db: Session = Depends(get_db)):
+async def get_character(character_name: str,
+                        current_admin_user: Character = Depends(get_current_admin_user),
+                        db: Session = Depends(get_db)):
     character = db.query(Character).filter(Character.username == character_name).first()
     return character
 

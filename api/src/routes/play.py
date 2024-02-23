@@ -12,7 +12,7 @@ router = APIRouter(prefix='/play', tags=['Play'])
 
 
 @router.post('/roll')
-async def roll_and_game(current_character: Annotated[Character, Depends(get_current_character)],
+async def roll_dice(current_character: Annotated[Character, Depends(get_current_character)],
                          chosen_approach: ChosenApproach, 
                          db: Session = Depends(get_db)):
     

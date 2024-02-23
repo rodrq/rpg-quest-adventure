@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import Response, JSONResponse
 from src.handlers.auth import login_for_access_token_handler
-from src.utils.auth import check_token
 from typing import Annotated
 from src.config.database import get_db
 from sqlalchemy.orm import Session
