@@ -9,7 +9,7 @@ router = APIRouter(prefix="/auth",
                    tags=["Authorization"])
 
 
-@router.post("/")
+@router.post("/login")
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     return login_for_access_token_handler(form_data)
     

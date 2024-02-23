@@ -10,7 +10,7 @@ router = APIRouter(prefix='/quest',
                    tags=['Quests'])
 
 
-@router.post("/")
+@router.post("/create")
 async def create_quest(current_character_game_data: Annotated[CharacterGameData, Depends(get_current_character)],
                        db: Session = Depends(get_db)):
     

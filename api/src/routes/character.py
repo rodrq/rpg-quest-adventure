@@ -11,7 +11,7 @@ router = APIRouter(prefix='/character',
                    tags=['Character creation'])
 
 
-@router.post('/')
+@router.post('/create')
 async def create_character(params: CharacterInDb, db: Session = Depends(get_db)):
     return await create_character_handler(params, db)
     

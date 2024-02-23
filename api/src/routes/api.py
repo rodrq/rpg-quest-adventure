@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from . import auth, character, quest, play, admin
 
-router = APIRouter()
+router = APIRouter(prefix='/api')
 
 router.include_router(character.router)
 
