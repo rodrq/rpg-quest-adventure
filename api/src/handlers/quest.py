@@ -46,8 +46,6 @@ async def create_quest_handler(current_character_game_data: CharacterGameData, d
         approaches=result['approaches'],
         cost = cost
     ) 
-
-    print(quest)
     db.add(quest)
     db.commit()
     return JSONResponse(content={"quest": result})
