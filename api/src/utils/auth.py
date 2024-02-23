@@ -5,7 +5,6 @@ from src.utils.query import get_character_query
 from src.utils.pw_hash import verify_password
 from datetime import datetime, timedelta
 from src.config.settings import SECRET_KEY, ALGORITHM
-from typing import Annotated
 from src.models.serializers import CharacterName
 from src.models.models import Character
 from src.models.enums import UserRole
