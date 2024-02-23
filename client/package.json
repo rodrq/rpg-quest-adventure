@@ -9,8 +9,17 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^3.0.2",
+    "@sveltejs/vite-plugin-svelte": "^3.0.1",
+    "autoprefixer": "^10.4.16",
+    "flowbite": "^2.3.0",
+    "flowbite-svelte": "^0.44.24",
+    "postcss": "^8.4.32",
+    "postcss-load-config": "^5.0.2",
     "svelte": "^4.2.11",
+    "tailwindcss": "^3.3.6",
     "vite": "^5.1.4"
+  },
+  "dependencies": {
+    "svelte-routing": "^2.12.0"
   }
 }

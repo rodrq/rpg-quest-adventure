@@ -1,8 +1,9 @@
-import './app.css'
-import App from './App.svelte'
+import "./app.pcss";
+import AppLayout from '/src/layouts/AppLayout.svelte';
 
-const app = new App({
-  target: document.getElementById('app'),
-})
 
-export default app
+const app = new AppLayout({
+  target: document.getElementById("app"),
+});
+
+export default app;
