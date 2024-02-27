@@ -20,7 +20,7 @@ def login_for_access_token_handler(form_data: OAuth2PasswordRequestForm, db: Ses
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         response = JSONResponse(content={"message": "Login succesfull"})
-        response.set_cookie(key="token", value=access_token, max_age=1800, samesite='none', secure=True, httponly=True)
+        response.set_cookie(key="token", value=access_token, max_age=7200, samesite='none', secure=True, httponly=True)
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

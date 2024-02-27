@@ -11,7 +11,7 @@ from src.utils.auth import create_access_token
 async def create_character_handler(create_character_params: CharacterInDb, db: Session):
     try:    
         if get_character_query(create_character_params.username, db):
-                raise HTTPException(status_code=400, detail="Character username already exists")
+                raise ValueError("Character username already exists")
         character = Character(
             username=create_character_params.username,
             password=get_hashed_password(create_character_params.password),
@@ -27,7 +27,7 @@ async def create_character_handler(create_character_params: CharacterInDb, db: S
         access_token = create_access_token(token_data)
         
         response = JSONResponse(content={"message": "Created character"})
-        response.set_cookie(key="token", value=access_token, max_age=1800, samesite='none', secure=True, httponly=True)
+        response.set_cookie(key="token", value=access_token, max_age=7200, samesite='none', secure=True, httponly=True)
         return response
 
     except Exception as e:
