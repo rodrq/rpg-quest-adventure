@@ -16,7 +16,7 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
                                  db: Session = Depends(get_db)):
     return login_for_access_token_handler(form_data, db)
     
-@router.get("/logout")
+@router.post("/logout")
 async def logout(response: Response):
     response = JSONResponse(content={"message": "Logout succesfull"})
     response.delete_cookie("token")
