@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 from src.config.database import Base
 from src.models.enums import CharacterClassesEnum, CharacterStateEnum, UserRole
-from src.models.validations import validate_class, validate_not_empty
+from src.models.validators import validate_enum, validate_not_empty
 
 class Character(Base):
     __tablename__ = 'characters'
@@ -22,13 +22,13 @@ class Character(Base):
     role = Column(Enum(UserRole), default=UserRole.user)
     
     @validates('username', 'password')
-    def validate_not_empty(self, key, value):
+    def non_empty_validator(self, key, value):
         return validate_not_empty(key, value)
 
-    @validates('class_')
-    def validate_class(self, key, value):
-        return validate_class(key, value)
-
+    @validates('class_', 'virtue', 'flaw')
+    def enum_validator(self, key, value):
+        return validate_enum(key, value)
+    
 
 class Quest(Base):
     __tablename__ = 'quests'
