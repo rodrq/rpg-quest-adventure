@@ -1,13 +1,34 @@
 <script>
     import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
     import RpgLogo from '../assets/rpg-quest.svg'
-    import { onMount } from 'svelte';
-    import { checkUserStatus } from '../context/userContext';
-    import user from '../context/userStore';
+    import { characterData, clearCharacterData } from '../stores/characterData'; 
+    import toast from 'svelte-french-toast';
+    import { navigate } from 'svelte-navigator';
 
-    onMount(() => {
-      checkUserStatus();
-    });
+    const logOutHandler = async () => {
+      try {
+          const response = await fetch('http://localhost:8000/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              credentials: 'include', 
+            });
+
+          if (response.ok) {
+              toast.success('Logged out');
+              clearCharacterData();
+              navigate('/')
+          } else {
+              console.error('Logout went wrong:', response.statusText);
+              toast.error('Logout went wrong');
+          }
+      } catch (error) {
+          console.error('Error during logout:', error);
+          toast.error('Error during logout');
+      }
+  };
+
 </script>
 
 <Navbar let:NavContainer>
@@ -17,14 +38,14 @@
       <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">AI RPG Adventure</span>
     </NavBrand>
     <NavHamburger/>
-    {#if $user.loggedIn}
+    {#if $characterData.username}
     <NavUl class='font-bold' >
       <NavLi href="/about">About</NavLi>
       <NavLi href="/play">Play</NavLi>
       <NavLi href="/journey">View journey</NavLi>
       <NavLi href="/ranking">Ranking</NavLi>
       <NavLi href="/restart">Restart</NavLi>
-      <NavLi href="/logout">Log out</NavLi>
+      <NavLi on:click={logOutHandler}>Log out</NavLi>
     </NavUl>
     {:else}
     <NavUl class='font-bold'>
