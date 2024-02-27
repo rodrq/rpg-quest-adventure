@@ -18,23 +18,28 @@ class CharacterClassesEnum(enum.Enum):
     druid = 'druid'
     paladin = 'paladin'
     rogue = 'rogue'
-    sorcerer = 'sorcerer'
-    monk = 'monk'
-    bard = 'bard'
-    necromancer = 'necromancer'
-    wizard = 'wizard'
     knight = 'knight'
     archer = 'archer'
-    assassin = 'assassin'
-    priest = 'priest'
-    shaman = 'shaman'
-    samurai = 'samurai'
-    summoner = 'summoner'
-    artificer = 'artificer'
-    warlord = 'warlord'
-    engineer = 'engineer'
-    juggernaut = 'juggernaut'
-    sentinel = 'sentinel'
-    elementalist = 'elementalist'
-    geomancer = 'geomancer'
-    brawler = 'brawler'
+
+class CharacterVirtuesEnum(enum.Enum):
+    courage = "courage"
+    honor = "honor"
+    compassion = "compassion"
+    wisdom = "wisdom"
+    resilience = "resilience"
+    generosity = "generosity"
+    determination = "determination"
+    humility = "humility"
+
+
+class CharacterFlawsEnum(enum.Enum):
+    cowardice = "cowardice"
+    greed = "greed"
+    dishonesty = "dishonesty"
+    cruelty = "cruelty"
+    ignorance = "ignorance"
+    selfishness = "selfishness"
+    impulsiveness = "impulsiveness"
+    arrogance = "arrogance"
+    
+    
