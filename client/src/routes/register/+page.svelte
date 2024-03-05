@@ -1,17 +1,15 @@
 <script>
-    import classesData from '../data/classes.json';
-    import virtuesData from '../data/virtues.json';
-    import flawsData from '../data/flaws.json';
+	  import { goto } from '$app/navigation';
+    import classesData from '$lib/data/classes.json';
+    import virtuesData from '$lib/data/virtues.json';
+    import flawsData from '$lib/data/flaws.json';
     import toast from 'svelte-french-toast';
-    import { Spinner } from 'flowbite-svelte';
+    import LoadingSpinner from '../../components/common/LoadingSpinner.svelte';
+    import { initializeCharacterData } from '$lib/stores/characterData'
 
-    import { navigate } from 'svelte-navigator';
-
-    import { initializeCharacterData } from '../stores/characterData';
-
-    let classes = Object.keys(classesData.classes);
-    let flaws = Object.keys(flawsData.flaws);
-    let virtues = Object.keys(virtuesData.virtues);
+    let classes = Object.keys(classesData);
+    let flaws = Object.keys(flawsData);
+    let virtues = Object.keys(virtuesData);
 
     let username = '';
     let password = '';
@@ -22,7 +20,6 @@
     let isLoading = false;
 
     const handleSubmit = async (event) => {
-      event.preventDefault();
       isLoading = true;
       try {
       const formData ={
@@ -32,7 +29,6 @@
         "virtue":selectedVirtue.toLowerCase(),
         "flaw":selectedFlaw.toLowerCase(),
       };
-
       const response = await fetch('http://localhost:8000/api/character/create', {
         method: 'POST',
         headers: {
@@ -47,12 +43,12 @@
       isLoading = false;
 
       if (response.ok) {
-        toast.success('Character created successfully: ', responseData);
         isLoading = true;
-        initializeCharacterData();
+        initializeCharacterData()
         isLoading= false;
+        toast.success('Character created successfully: ', responseData);
+        goto("/play")
         
-        navigate('/about'); 
       } else {
         toast.error(responseData.detail);
 
@@ -67,8 +63,7 @@
   
   <div class="container mx-auto px-10 py-5 text-gray-600 text-xl ">
     <h1 class="text-2xl font-bold mb-4">Character Creation</h1>
-  
-    <form class="w-50" on:submit={handleSubmit}>
+    <form class="w-50" on:submit|preventDefault={handleSubmit}>
       <div class="mb-4">
         <label for="username" class="block text-sm font-bold mb-2">Character Name:</label>
         <input type="text" id="username" bind:value={username} class="border p-2 lg:w-[20vw] w-[50vw]" />
@@ -108,9 +103,7 @@
         
       </div>
       {#if (isLoading === true)}
-      <div class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80">
-        <Spinner/>
-      </div>
+      <LoadingSpinner/>
       {/if}
       <button type="submit" class="bg-blue-500 text-white py-2 px-4 mb-10 rounded">Create Character</button>
     </form>

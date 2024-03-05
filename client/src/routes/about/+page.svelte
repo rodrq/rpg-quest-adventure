@@ -1,5 +1,5 @@
 <script>
-    import PromptImage from '../assets/prompt.png'
+    import PromptImage from '../../assets/prompt.png'
 </script>
 
 

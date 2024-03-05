@@ -1,12 +1,19 @@
 <script>
+	  import Loading from './LoadingSpinner.svelte';
     import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
-    import RpgLogo from '../assets/rpg-quest.svg'
-    import { characterData, clearCharacterData } from '../stores/characterData'; 
+    import RpgLogo from '../../assets/rpg-quest.svg'
+    import { characterData, clearCharacterData } from '$lib/stores/characterData'; 
+    import { Button, Modal } from 'flowbite-svelte';
     import toast from 'svelte-french-toast';
-    import { navigate } from 'svelte-navigator';
+    import { goto } from '$app/navigation';
+    import LoadingSpinner from './LoadingSpinner.svelte';
+
+    let openLogoutModal = false;
+    let isLoading = false;
 
     const logOutHandler = async () => {
       try {
+          isLoading = true;
           const response = await fetch('http://localhost:8000/api/auth/logout', {
             method: 'POST',
             headers: {
@@ -14,20 +21,23 @@
               },
               credentials: 'include', 
             });
-
+          isLoading=false;
           if (response.ok) {
               toast.success('Logged out');
               clearCharacterData();
-              navigate('/')
+              goto('/');
+              
           } else {
               console.error('Logout went wrong:', response.statusText);
               toast.error('Logout went wrong');
           }
       } catch (error) {
+          isLoading=false;
           console.error('Error during logout:', error);
           toast.error('Error during logout');
       }
   };
+    
 
 </script>
 
@@ -45,7 +55,7 @@
       <NavLi href="/journey">View journey</NavLi>
       <NavLi href="/ranking">Ranking</NavLi>
       <NavLi href="/restart">Restart</NavLi>
-      <NavLi on:click={logOutHandler}>Log out</NavLi>
+      <NavLi on:click={() => (openLogoutModal = true)}>Log out</NavLi>
     </NavUl>
     {:else}
     <NavUl class='font-bold'>
@@ -56,4 +66,22 @@
     </NavUl>
     {/if}
   </NavContainer>
+
+  {#if openLogoutModal === true}
+    <Modal title="Terms of Service" bind:open={openLogoutModal} autoclose>
+      <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+        Are you sure you want to log out?
+      </p>
+      
+      <svelte:fragment slot="footer">
+        <Button on:click={logOutHandler}>Yes</Button>
+        <Button color="alternative" on:click={openLogoutModal=false}>Cancel</Button>
+      </svelte:fragment>
+    </Modal>
+  {/if}
+
+  {#if isLoading === true}
+    <LoadingSpinner/>
+  {/if}
+
 </Navbar>
