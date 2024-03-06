@@ -1,7 +1,9 @@
 version: "3.8"
+name: rpg-quest-db
 services:
   db:
     image: postgres:13
+    hostname: rpg-quest-api
     environment:
       POSTGRES_DB: rpg
       POSTGRES_USER: rodrq
