@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from src.config.database import get_db
 from src.models.models import Character
-from src.models.serializers import CharacterInDb
+from src.models.schemas import CharacterInDb
 from src.handlers.character import create_character_handler
 from src.utils.auth import get_current_character
 from src.utils.game import convert_character_to_gamedata

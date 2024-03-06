@@ -1,4 +1,4 @@
-from src.models.serializers import CharacterInDb
+from src.models.schemas import CharacterInDb
 from src.models.models import Character
 from src.utils.pw_hash import get_hashed_password
 from src.utils.query import get_character_query

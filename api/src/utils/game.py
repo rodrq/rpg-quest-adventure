@@ -1,5 +1,5 @@
 from src.models.models import Character
-from src.models.serializers import CharacterGameData
+from src.models.schemas import CharacterGameData
 
 
 def convert_character_to_gamedata(character: Character) -> CharacterGameData:

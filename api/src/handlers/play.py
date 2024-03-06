@@ -2,7 +2,8 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from src.models.models import Character, Quest
-from src.models.serializers import CharacterGameData, ChosenApproach, Approach
+from src.models.serializers import ChosenApproach
+from src.models.schemas import CharacterGameData, Approach
 import random
 from src.utils.exceptions import DeadOrWinner
 

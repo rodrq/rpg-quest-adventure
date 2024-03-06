@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.utils.auth import get_current_admin_user
 from src.config.database import get_db
 from src.models.models import Character, Quest
-from src.models.serializers import CharacterName
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix='/admin',
@@ -40,10 +39,10 @@ async def get_characters(current_admin_user: Character = Depends(get_current_adm
     return characters
 
 @router.delete('/delete_character')
-async def delete_character(username: CharacterName,
+async def delete_character(username: str,
                            db: Session = Depends(get_db),
                            current_admin_user: Character = Depends(get_current_admin_user)):
-    character = db.query(Character).filter(Character.username == username.username).first()
+    character = db.query(Character).filter(Character.username == username).first()
     if character:
         db.delete(character)
         db.commit()

@@ -5,7 +5,6 @@ from src.utils.query import get_character_query
 from src.utils.pw_hash import verify_password
 from datetime import datetime, timedelta
 from src.config.settings import SECRET_KEY, ALGORITHM
-from src.models.serializers import CharacterName
 from src.models.models import Character
 from src.models.enums import UserRole
 from sqlalchemy.orm import Session
@@ -36,7 +35,7 @@ def decode_jwt_token_sub(token: str):
         jwt_character_username: str = payload.get("sub")
         if jwt_character_username is None:
             raise credentials_exception
-        return CharacterName(username=jwt_character_username)
+        return jwt_character_username
     except JWTError:
         raise credentials_exception
 
@@ -46,8 +45,8 @@ def get_current_character_username(token: str = Depends(oauth2_scheme)):
     return character_name
 
 
-def get_current_character(character_name: CharacterName = Depends(get_current_character_username), db: Session = Depends(get_db)):
-    character = get_character_query(username=character_name.username, db = db)
+def get_current_character(character_name: str = Depends(get_current_character_username), db: Session = Depends(get_db)):
+    character = get_character_query(username=character_name, db = db)
     if character is None:
         raise credentials_exception
     return character
