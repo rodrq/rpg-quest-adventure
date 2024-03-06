@@ -36,7 +36,6 @@
           toast.error('Error during logout');
       }
   };
-    
 
 </script>
 
@@ -58,6 +57,7 @@
     </NavUl>
     {:else}
     <NavUl class='font-bold'>
+      <NavLi href="/">Home</NavLi>
       <NavLi href="/about">About</NavLi>
       <NavLi href="/ranking">Ranking</NavLi>
       <NavLi href="/register">Create Character</NavLi>
