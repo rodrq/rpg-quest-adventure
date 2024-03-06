@@ -1,25 +1,25 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from src.models.models import Character, Quest
 from src.models.serializers import ChosenApproach
-from src.models.schemas import CharacterGameData, Approach
+from src.models.schemas import Approach
 import random
 from src.utils.exceptions import DeadOrWinner
+from src.utils.prompt import prompt_maps
 
-def roll_handler(current_character_gamedata: CharacterGameData, chosen_approach: ChosenApproach, db: Session):
+def roll_handler(current_character: Character, chosen_approach: ChosenApproach, db: Session):
     try:
         #TODO make this a dependency
-        if current_character_gamedata.char_state == 'dead' or current_character_gamedata.char_state == 'winner':
+        if current_character.char_state == 'dead' or current_character.char_state == 'winner':
             raise DeadOrWinner(
                     """Can't play anymore. Your character's either dead or your journey came
                     to an end after exploring the whole world and coming victorious."""
                     )
         
-
-        #get latest quest on db, meaning, the one we just created
-        current_quest = db.query(Quest).order_by(desc(Quest.quest_id)).first()
-
+        #get latest quest on db, meaning, the one just created
+        current_quest: Quest = current_character.quests.order_by(desc(Quest.created_at)).first()
+        
         if current_quest and current_quest.selected_approach==None:
             
             approach = current_quest.approaches[f'approach_{chosen_approach.approach_number}']
@@ -29,66 +29,49 @@ def roll_handler(current_character_gamedata: CharacterGameData, chosen_approach:
                                 failure_description=approach['failure_description'],
                                 chance_of_success=approach['chance_of_success'])
             
-            #save aproach to quest table
+            #save chosen aproach to Quest table
             if approach:
                 current_quest.selected_approach = chosen_approach.approach_number
             
-            #Every 200 honor, 1% more chance per approach 
-            gamey_chance_of_success = approach.chance_of_success + (current_character_gamedata.honor_points/200)
+            #Every 200 honor, +1% chance of success
+            processed_chance_of_success = approach.chance_of_success + (current_character.honor_points/200)
             dice_roll = random.randint(1, 100)
-            if dice_roll < gamey_chance_of_success:
+            if dice_roll >= processed_chance_of_success:
                 # every 1% chance of failure = 10 honor
                 honor_gained = (100 - approach.chance_of_success) * 10
-                return roll_success_handler(current_character_gamedata, honor_gained, approach.success_description, db)
+
+                return roll_success_handler(current_character, current_quest, honor_gained, approach.success_description, db)
             else:
-                return roll_failure_handler(current_character_gamedata, approach.failure_description, db)
+                return roll_failure_handler(current_character, current_quest, approach.failure_description, db)
+        else:
+            return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Quest was already completed. Generate a new one")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-def roll_success_handler(current_character: CharacterGameData, honor_gained, game_success_description, db: Session):
+def roll_success_handler(current_character: Character, current_quest: Quest, honor_gained, approach_success_description, db: Session):
     try:
+        if current_quest:
+            current_quest.survived = True
+        
         if current_character:
-            new_map_level = current_character.map_level + 1
-            new_honor_points = current_character.honor_points + honor_gained
-            update_values = {
-                Character.map_level: new_map_level,
-                Character.honor_points: new_honor_points
-            }
-
-            if new_map_level >= 10:
-                update_values[Character.char_state] = 'winner'
-                return {'message':f'{game_success_description} You are a champion and your adventure ends here.'}
-
-            db.query(Character).filter(Character.username == current_character.username).update(update_values)
+            current_character.map_level += 1
+            current_character.honor_points += honor_gained
+            #Game ends after last map, so we check.
+            if current_character.map_level >= len(prompt_maps):
+                current_character.char_state = 'winner'
+                return {'message':f'{approach_success_description} Congratulations, you are a champion and your adventure ends here.'}
             db.commit()
-            return {'message':f'{game_success_description} You can continue your adventure'}
+            return {'message':f'{approach_success_description} You can continue your adventure'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-def roll_failure_handler(current_character: CharacterGameData, game_failure_description, db: Session):
+def roll_failure_handler(current_character: Character, current_quest: Quest, approach_failure_description, db: Session):
     try:
-        db.query(Character).filter(Character.username == current_character.username).update({Character.char_state: 'dead'})
+        if current_quest:
+            current_quest.survived = False
+        current_character.char_state = 'dead'
         db.commit()
-        return {'message': f'{game_failure_description} You died.' }
+        return {'message': f'{approach_failure_description} You died.' }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-def reset_character_handler(current_character_gamedata: CharacterGameData, db:Session):
-    
-    character = db.query(Character).filter(Character.username == current_character_gamedata.username).first()
-    print(character.char_state)
-    if character:
-        new_map_level = 1
-        new_honor_points = 0
-        new_char_state = 'adventuring'
-        update_values = {
-            Character.map_level: new_map_level,
-            Character.honor_points: new_honor_points,
-            Character.char_state: new_char_state
-        }
-        db.query(Character).filter(Character.username == character.username).update(update_values)
-        db.commit()
-    character = db.query(Character).filter(Character.username == current_character_gamedata.username).first()
-    print(character.char_state)
-    
-    return {'message': 'Character reset.' }
