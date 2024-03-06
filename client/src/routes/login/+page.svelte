@@ -49,6 +49,10 @@
 
 </script>
 
+<head>
+  <title>RPG Quest - Login</title>
+</head>
+
 
 <div class="container mx-auto px-10 py-5 text-gray-600 text-xl ">
     <h1 class="text-2xl font-bold mb-4">Character Creation</h1>

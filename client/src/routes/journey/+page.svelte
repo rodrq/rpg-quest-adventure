@@ -2,6 +2,10 @@
     export let data;
     const quests = data.data;
 </script>
+
+<head>
+    <title>RPG Quest - Journey</title>
+</head>
   
 <div>
     <h1>Quests</h1>

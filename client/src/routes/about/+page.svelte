@@ -2,6 +2,9 @@
     import PromptImage from '../../assets/prompt.png'
 </script>
 
+<head>
+  <title>RPG Quest - About</title>
+</head>
 
 <div class="container mx-auto px-10 text-gray-600 text-xl">
     <h1 class="text-2xl font-bold mb-4">

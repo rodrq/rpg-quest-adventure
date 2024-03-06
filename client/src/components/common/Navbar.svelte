@@ -1,13 +1,12 @@
 <script>
-	  import Loading from './LoadingSpinner.svelte';
     import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
-    import RpgLogo from '../../assets/rpg-quest.svg'
+    import RpgLogo from '../../assets/favicon.svg'
     import { characterData, clearCharacterData } from '$lib/stores/characterData'; 
     import { Button, Modal } from 'flowbite-svelte';
     import toast from 'svelte-french-toast';
     import { goto } from '$app/navigation';
     import LoadingSpinner from './LoadingSpinner.svelte';
-
+    
     let openLogoutModal = false;
     let isLoading = false;
 
