@@ -27,4 +27,5 @@ class CharacterGameData(BaseModel):
     honor_points: int
     map_level: int
     char_state: str
+    times_reset: int
     

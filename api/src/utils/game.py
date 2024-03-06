@@ -11,4 +11,5 @@ def convert_character_to_gamedata(character: Character) -> CharacterGameData:
         honor_points=character.honor_points,
         map_level=character.map_level,
         char_state=character.char_state,
+        times_reset= character.times_reset,
     )

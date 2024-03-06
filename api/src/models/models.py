@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Enum, JSON
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Enum, JSON, Boolean
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 from src.config.database import Base
@@ -11,12 +11,15 @@ class Character(Base):
     username = Column(String, primary_key=True, nullable=False, unique=True, index=True)
     password = Column(String, nullable=False)
     class_ = Column(Enum(CharacterClassesEnum), nullable=False)
-    quests = relationship('Quest', back_populates='character')
-    honor_points = Column(Integer, default=0)
     virtue = Column(String, nullable=False)
     flaw = Column(String, nullable=False)
+    
+    quests = relationship('Quest', back_populates='character')
+    
+    honor_points = Column(Integer, default=0)
     char_state = Column(Enum(CharacterStateEnum), default=CharacterStateEnum.adventuring)
     map_level = Column(Integer, name='map level', default=1)
+    times_reset = Column(Integer, default=0)
     
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     role = Column(Enum(UserRole), default=UserRole.user)
@@ -29,7 +32,6 @@ class Character(Base):
     def enum_validator(self, key, value):
         return validate_enum(key, value)
     
-
 class Quest(Base):
     __tablename__ = 'quests'
     
@@ -41,6 +43,8 @@ class Quest(Base):
     cost = Column(Float, name="cost")
     approaches = Column(JSON, name='approaches')
     selected_approach = Column(Integer, name='selected_approach', default=None)
+    survived = Column(Boolean, default=None)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
 
     
