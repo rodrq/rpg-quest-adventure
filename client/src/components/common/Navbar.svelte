@@ -48,6 +48,7 @@
     <NavHamburger/>
     {#if $characterData.username}
     <NavUl class='font-bold' >
+      <NavLi href="/">Home</NavLi>
       <NavLi href="/about">About</NavLi>
       <NavLi href="/play">Play</NavLi>
       <NavLi href="/journey">View journey</NavLi>
