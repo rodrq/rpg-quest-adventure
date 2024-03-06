@@ -17,10 +17,10 @@
 
 
 
-<div class="px-10 h-screen">
-    <h1 class="text-2xl font-bold">
+<div class="container mx-auto px-10 text-gray-600 text-xl h-screen">
+    <div class="text-2xl font-bold mb-4">
         Player Rankings
-    </h1>
+    </div>
     <h2 class="mb-2">
         * Click on anyone's name to see their journey
     </h2>
@@ -40,7 +40,7 @@
         <tr class="{ranking % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
             <td class="py-2 px-4 border-b text-center">{ranking}</td>
             <td class="py-2 px-4 border-b text-center font-bold">
-                <a href="/view_journey/{name}" class="hover:text-blue-500">
+                <a href="/journey/{name}" class="hover:text-blue-500">
                     {name}
                 </a>
             </td>

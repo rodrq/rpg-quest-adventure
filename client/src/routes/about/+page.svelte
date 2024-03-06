@@ -21,5 +21,5 @@
     </p>
     <img class='my-3'src={PromptImage} alt="prompt">
     <p>Project made with FastAPI, React, and OpenAI API.</p>
-    <p>Check the whole project here: <a href='https://github.com/rodrq/rpg-quest' class='underline'target="_blank" rel="noopener noreferrer">https://github.com/rodrq/rpg-quest</a></p>
+    <p>Check the whole project here: <a href='https://github.com/rodrq/rpg-quest-adventure' class='underline'target="_blank" rel="noopener noreferrer">https://github.com/rodrq/rpg-quest-adventuret</a></p>
 </div>
