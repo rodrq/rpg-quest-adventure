@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@emailjs/browser':
+    specifier: ^4.3.1
+    version: 4.3.1
   svelte-french-toast:
     specifier: ^1.2.0
     version: 1.2.0(svelte@4.2.12)
@@ -64,6 +67,11 @@ packages:
     dependencies:
       regenerator-runtime: 0.14.1
     dev: true
+
+  /@emailjs/browser@4.3.1:
+    resolution: {integrity: sha512-Pb9KL6rsEGMhzFEeCr5No+VazPyBJFRLu59tAEgKmjPPA7z7gOGIJuyDLEZG5sUp0NN9WF0407govvrQ+vKvVw==}
+    engines: {node: '>=14.0.0'}
+    dev: false
 
   /@esbuild/aix-ppc64@0.19.12:
     resolution: {integrity: sha512-bmoCYyWdEL3wDQIVbcyzRyeKLgk2WtWLTWz1ZIAZF/EGbNOwSA6ew3PftJ1PqMiOOGu0OyFMzG53L0zqIpPeNA==}
