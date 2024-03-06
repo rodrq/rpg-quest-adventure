@@ -21,6 +21,5 @@ def validate_enum(key, value):
     if value not in enum_type:
         raise ValueError(f"Invalid value for {key}: {value}")
 
-    print(value)
     return value
  
