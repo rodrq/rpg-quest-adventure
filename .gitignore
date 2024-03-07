@@ -1,6 +1,7 @@
 venv
 todo.md
 .env
+*.sh
 test.py
 __pycache__
 api/data
