@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import desc
 from src.models.models import Quest, Character
 from src.models.serializers import QuestResponse
@@ -20,11 +20,14 @@ async def create_quest_handler(current_character: Character, db: Session):
               )
     #TODO make this a dependency or middleware
     if current_character.quests:
-      last_quest: Quest = current_character.quests.order_by(desc(Quest.created_at)).first()
-      print(last_quest)
+      last_quest: Quest = (current_character.quests
+                           .options(joinedload(Quest.character))
+                           .order_by(desc(Quest.created_at))
+                           .first())
+      
       if last_quest and last_quest.selected_approach == None:
         raise LastQuestNotFinished(
-          f"""Can't create quest. Please first finish the last one called {last_quest.title}"""
+          f"""Can't create quest. Please finish your last one called '{last_quest.title}' """
         )
     
     quest_map = prompt_maps[current_character.map_level]

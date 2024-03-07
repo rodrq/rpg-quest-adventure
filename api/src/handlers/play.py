@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import desc
 from src.models.models import Character, Quest
 from src.models.serializers import ChosenApproach
@@ -17,8 +17,11 @@ def roll_handler(current_character: Character, chosen_approach: ChosenApproach, 
                     to an end after exploring the whole world and coming victorious."""
                     )
         
-        #get latest quest on db, meaning, the one just created
-        current_quest: Quest = current_character.quests.order_by(desc(Quest.created_at)).first()
+        #get latest quest on db, meaning, the one just created.
+        current_quest: Quest = (current_character.quests
+                                .options(joinedload(Quest.character))
+                                .order_by(desc(Quest.created_at))
+                                .first())
         
         if current_quest and current_quest.selected_approach==None:
             

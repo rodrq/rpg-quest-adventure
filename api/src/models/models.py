@@ -14,7 +14,7 @@ class Character(Base):
     virtue = Column(String, nullable=False)
     flaw = Column(String, nullable=False)
     
-    quests = relationship('Quest', back_populates='character')
+    quests = relationship('Quest', back_populates='character', lazy='dynamic')
     
     honor_points = Column(Integer, default=0)
     char_state = Column(Enum(CharacterStateEnum), default=CharacterStateEnum.adventuring)
