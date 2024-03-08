@@ -1,25 +1,30 @@
-from src.models.enums import CharacterClassesEnum, CharacterVirtuesEnum, CharacterFlawsEnum
+from fastapi import HTTPException, status
+from .enums import CharacterClasses, CharacterFlaws, CharacterVirtues
 
-def validate_not_empty(key, value):
-    if not value or value.isspace():
-        raise ValueError(f"{key} cannot be empty")
-    return value
 
-def validate_enum(key, value):
-    if not value:
-        raise ValueError(f"{key} cannot be empty")
-    
+def form_validator(key: str, value: str) -> str:
+    if key in ('username', 'password'):
+        if not value or value.isspace():
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail=f"{key} can't be empty.")
+        return value
+
     enum_mapping = {
-        'class_': CharacterClassesEnum,
-        'virtue': CharacterVirtuesEnum,
-        'flaw': CharacterFlawsEnum,
+        'class_': CharacterClasses,
+        'virtue': CharacterVirtues,
+        'flaw': CharacterFlaws,
     }
-    enum_type = enum_mapping.get(key)
-    if enum_type is None:
-        raise ValueError(f"Invalid key: {key}")
 
-    if value not in enum_type:
-        raise ValueError(f"Invalid value for {key}: {value}")
+    enum_member = enum_mapping.get(key)
 
+    if value and value not in enum_member:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"{value} is not a valid {key}")
     return value
- 
+
+
+def approach_number_validator(approach_number) -> int:
+    if approach_number < 1 or approach_number > 3:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Approach number must be between 1 and 3")
+    return approach_number
