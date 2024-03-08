@@ -1,15 +1,18 @@
 import enum
 
-class CharacterStateEnum(enum.Enum):
+
+class CharacterState(str, enum.Enum):
     dead = 'dead'
     winner = 'winner'
     adventuring = 'adventuring'
 
-class UserRole(str, enum.Enum):
+
+class UserRoles(str, enum.Enum):
     user = "user"
-    admin = "admin"   
-    
-class CharacterClassesEnum(enum.Enum):
+    admin = "admin"
+
+
+class CharacterClasses(enum.Enum):
     warrior = 'warrior'
     mage = 'mage'
     barbarian = 'barbarian'
@@ -21,7 +24,8 @@ class CharacterClassesEnum(enum.Enum):
     knight = 'knight'
     archer = 'archer'
 
-class CharacterVirtuesEnum(enum.Enum):
+
+class CharacterVirtues(enum.Enum):
     courage = "courage"
     honor = "honor"
     compassion = "compassion"
@@ -32,7 +36,7 @@ class CharacterVirtuesEnum(enum.Enum):
     humility = "humility"
 
 
-class CharacterFlawsEnum(enum.Enum):
+class CharacterFlaws(enum.Enum):
     cowardice = "cowardice"
     greed = "greed"
     dishonesty = "dishonesty"
@@ -41,5 +45,3 @@ class CharacterFlawsEnum(enum.Enum):
     selfishness = "selfishness"
     impulsiveness = "impulsiveness"
     arrogance = "arrogance"
-    
-    
