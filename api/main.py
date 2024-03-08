@@ -1,32 +1,26 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from src.config.settings import app_configs
 from src.routes import api
 from src.config.database import Base, engine
-from fastapi.middleware.cors import CORSMiddleware
-from src.utils.middlewares import TokenToAuthorizationMiddleware
+
 
 def get_app() -> FastAPI:
 
-    app = FastAPI()
+    init_app = FastAPI(**app_configs)
 
     Base.metadata.create_all(bind=engine)
-    
-    app.include_router(api.router)
 
-    app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"])
-    
-    app.add_middleware(TokenToAuthorizationMiddleware)
+    init_app.include_router(api.router)
 
+    init_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:5173"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"])
 
-    
+    return init_app
 
-    return app
 
 app = get_app()
-
-
-
