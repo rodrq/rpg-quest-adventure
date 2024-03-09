@@ -1,6 +1,9 @@
 venv
 todo.md
 .env
+*.env
+.env*
+*.env.*
 *.sh
 *.txt
 test.py
@@ -12,6 +15,7 @@ Dockerfile
 .dockerignore
 api/fly.toml
 .vscode
+.ruff*
 # Logs
 logs
 *.log
