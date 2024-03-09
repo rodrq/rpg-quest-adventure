@@ -13,6 +13,7 @@ test
 .pylintrc
 Dockerfile
 .dockerignore
+docker-compose.yml
 api/fly.toml
 .vscode
 .ruff*
