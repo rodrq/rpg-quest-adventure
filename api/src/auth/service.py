@@ -12,6 +12,7 @@ from src.auth import utils
 from src.auth.config import auth_config
 
 
+
 async def create_user(user_form: UserSchema):
     insert_query = (
         insert(User)

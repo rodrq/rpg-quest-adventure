@@ -1,7 +1,3 @@
-from fastapi import HTTPException
+# from src.exceptions import NotAuthenticated
 
-credentials_exception = HTTPException(
-    status_code=401,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
+# class 

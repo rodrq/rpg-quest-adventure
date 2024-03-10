@@ -10,12 +10,30 @@ class Settings(BaseSettings):
     
     OPENAI_API_KEY: str
     OPENAI_ORG_ID: str
-    DB_URL: str
-    HASH_SECRET_KEY: str
     ALLOWED_CORS_ORIGINS: set[AnyUrl]
     ENVIRONMENT: str
+    
+    JWT_SECRET: str
+    
+    DB_URL: PostgresDsn
+    POSTGRES_DB: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: str
+    
+    
 
+settings = Settings()
 
+def get_conn_str():
+    return f"""
+    dbname={settings.POSTGRES_DB}
+    user={settings.POSTGRES_USER}
+    password={settings.POSTGRES_PASSWORD}
+    host={settings.POSTGRES_HOST}
+    port={settings.POSTGRES_PORT}
+    """
 app_configs = {"title": "RPG Quest API"}
 
 if Settings().ENVIRONMENT != "local":

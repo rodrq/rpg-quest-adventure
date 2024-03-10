@@ -1,5 +1,5 @@
 from enum import Enum
-from sqlalchemy import MetaData
+
 
 POSTGRES_INDEXES_NAMING_CONVENTION = {
     "ix": "%(column_0_label)s_idx",
