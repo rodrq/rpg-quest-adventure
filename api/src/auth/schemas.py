@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field, field_validator, Extra
+from pydantic import BaseModel, Field, field_validator
 from src.auth.exceptions import FieldsAreEmpty
 
-class UserSchema(BaseModel):
+class UserForm(BaseModel):
     username: str
     password: str
     
@@ -10,20 +10,16 @@ class UserSchema(BaseModel):
         if not value or value.isspace():
             raise FieldsAreEmpty
         return value
-    
+
 class UserResponse(BaseModel):
     id: int
     username: str
-    is_admin: bool
     
 
 class JWTData(BaseModel):
     user_id: int = Field(alias="sub")
-    is_admin: bool = False
 
 
 class AccessTokenResponse(BaseModel):
     access_token: str
-    refresh_token: str
-
 

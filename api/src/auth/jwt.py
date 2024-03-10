@@ -1,26 +1,20 @@
-from typing import Annotated, Optional
 from datetime import datetime, timedelta
-from fastapi import Depends, Cookie
-from jose import jwt
-from jose.exceptions import ExpiredSignatureError, JWTClaimsError
+from fastapi import Cookie
+from jose import jwt, JWTError
 from src.config import settings
 from src.auth.config import auth_config
-from src.auth.exceptions import AuthorizationFailed, AuthRequired, InvalidToken
-from src.auth.schemas import JWTData
+from src.auth.exceptions import InvalidToken, AuthRequired
 
-
-def create_token(*, user: dict, expires_delta=timedelta(minutes=auth_config.JWT_EXP)):
+def create_access_token(user_id: int, expires_delta=timedelta(hours=auth_config.JWT_EXP)):
     jwt_data = {
-        "sub": str(user["id"]),
-        "exp": datetime.utcnow() + expires_delta,
-        "is_admin": user["is_admin"],
+        "sub": str(user_id),
+        "exp": datetime.utcnow() + expires_delta
     }
-    return jwt.encode(jwt_data, settings.JWT_SECRET, auth_config.JWT_ALG)
+    access_token = jwt.encode(jwt_data, settings.JWT_SECRET, auth_config.JWT_ALG)
+    return access_token
 
 
-async def parse_jwt_user_data(access_token: str = Cookie(default=None),
-                              refresh_token: str = Cookie(default=None)):
-    
+async def parse_jwt_user_data(access_token: str = Cookie(default=None)):
     if not access_token:
         raise AuthRequired()
     
@@ -28,14 +22,8 @@ async def parse_jwt_user_data(access_token: str = Cookie(default=None),
         payload = jwt.decode(access_token, 
                              auth_config.JWT_SECRET, 
                              algorithms=[auth_config.JWT_ALG])
-        
-    except ExpiredSignatureError:
-        #refresh token
+            
+    except JWTError:
         raise InvalidToken()
-    return JWTData(**payload)
-
-async def refresh_expired_access_token(refresh_token: str = Cookie(default=None)):
-    if not refresh_token:
-        raise AuthRequired()
     
-    return
+    return int(payload["sub"])

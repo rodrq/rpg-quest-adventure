@@ -25,5 +25,3 @@ class UsernameTaken(BadRequest):
     DETAIL = ErrorCode.USERNAME_TAKEN
 
 
-class RefreshTokenNotValid(NotAuthenticated):
-    DETAIL = ErrorCode.REFRESH_TOKEN_NOT_VALID
