@@ -1,24 +1,41 @@
+from typing import Annotated, Optional
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from src.config import Settings
-from .exceptions import credentials_exception
-
-def create_access_token(data: dict, expires_delta=timedelta(minutes=30)):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, Settings().HASH_SECRET_KEY, "HS256")
-    return encoded_jwt
+from fastapi import Depends, Cookie
+from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTClaimsError
+from src.config import settings
+from src.auth.config import auth_config
+from src.auth.exceptions import AuthorizationFailed, AuthRequired, InvalidToken
+from src.auth.schemas import JWTData
 
 
-def decode_jwt_token_sub(token: str):
+def create_token(*, user: dict, expires_delta=timedelta(minutes=auth_config.JWT_EXP)):
+    jwt_data = {
+        "sub": str(user["id"]),
+        "exp": datetime.utcnow() + expires_delta,
+        "is_admin": user["is_admin"],
+    }
+    return jwt.encode(jwt_data, settings.JWT_SECRET, auth_config.JWT_ALG)
+
+
+async def parse_jwt_user_data(access_token: str = Cookie(default=None),
+                              refresh_token: str = Cookie(default=None)):
+    
+    if not access_token:
+        raise AuthRequired()
+    
     try:
-        payload = jwt.decode(
-            token, Settings().HASH_SECRET_KEY, algorithms="HS256")
-        jwt_character_username: str = payload.get("sub")
-        if jwt_character_username is None:
-            raise credentials_exception
-        return jwt_character_username
+        payload = jwt.decode(access_token, 
+                             auth_config.JWT_SECRET, 
+                             algorithms=[auth_config.JWT_ALG])
+        
+    except ExpiredSignatureError:
+        #refresh token
+        raise InvalidToken()
+    return JWTData(**payload)
 
-    except JWTError as exc:
-        raise credentials_exception from exc
+async def refresh_expired_access_token(refresh_token: str = Cookie(default=None)):
+    if not refresh_token:
+        raise AuthRequired()
+    
+    return

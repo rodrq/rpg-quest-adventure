@@ -1,7 +1,29 @@
-from fastapi import HTTPException
+from src.auth.constants import ErrorCode
+from src.exceptions import BadRequest, NotAuthenticated, PermissionDenied
 
-credentials_exception = HTTPException(
-    status_code=401,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
+class FieldsAreEmpty(BadRequest):
+    DETAIL = ErrorCode.FIELDS_ARE_EMPTY
+
+
+class AuthRequired(NotAuthenticated):
+    DETAIL = ErrorCode.AUTHENTICATION_REQUIRED
+
+
+class AuthorizationFailed(PermissionDenied):
+    DETAIL = ErrorCode.AUTHORIZATION_FAILED
+
+
+class InvalidToken(NotAuthenticated):
+    DETAIL = ErrorCode.INVALID_TOKEN
+
+
+class InvalidCredentials(NotAuthenticated):
+    DETAIL = ErrorCode.INVALID_CREDENTIALS
+
+
+class UsernameTaken(BadRequest):
+    DETAIL = ErrorCode.USERNAME_TAKEN
+
+
+class RefreshTokenNotValid(NotAuthenticated):
+    DETAIL = ErrorCode.REFRESH_TOKEN_NOT_VALID
