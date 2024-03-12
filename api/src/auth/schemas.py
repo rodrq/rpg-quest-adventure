@@ -19,6 +19,7 @@ class UserResponse(BaseModel):
     username: str
     characters_ids: list[int] | None
     current_character: str | None
+    is_admin: bool
 
 
 class JWTData(BaseModel):
