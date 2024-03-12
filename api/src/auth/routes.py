@@ -21,7 +21,7 @@ async def get_my_user(user_id: int = Depends(parse_jwt_user_data)) -> UserRespon
     return UserResponse(**user)
 
 
-@router.post("/user/login")
+@router.post("/login")
 async def login(auth_data: UserForm, response: Response) -> AccessTokenResponse:
     user = await service.authenticate_user(auth_data)
     access_token_value = jwt.create_access_token(user_id=user.id)
@@ -30,7 +30,7 @@ async def login(auth_data: UserForm, response: Response) -> AccessTokenResponse:
     return AccessTokenResponse(access_token=access_token_value)
 
 
-@router.post("/user/logout")
+@router.post("/logout")
 async def logout(response: Response) -> dict[str, str]:
     response.delete_cookie(key="access_token")
     return {"message": "success logout"}
