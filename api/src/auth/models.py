@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, func, Boolean, LargeBinary
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, String, DateTime, func, Boolean, LargeBinary
 from src.models import Base
 
 
@@ -12,4 +11,5 @@ class User(Base):
     is_admin = Column(Boolean, server_default="false", nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, onupdate=func.now())
-
+    characters = Column(String, default= None) #TODO
+    current_character = Column(String, default=None) #TODO

@@ -1,34 +1,25 @@
-# from fastapi import HTTPException, status
-# from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+from src.character.enum import CharacterClassEnum, CharacterVirtueEnum, CharacterFlawEnum, CharacterStateEnum
+from src.character.exceptions import FieldsAreEmpty
 
 
-
-# class CharacterParams(BaseModel):
-#     username: str
-#     class_: str
-#     virtue: str
-#     flaw: str
-
-# class CharacterInDb(CharacterParams):
-#     password: str
-
-
-# def form_validator(key: str, value: str) -> str:
-#     if key in ('username', 'password'):
-#         if not value or value.isspace():
-#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-#                                 detail=f"{key} can't be empty.")
-#         return value
-
-#     enum_mapping = {
-#         'class_': CharacterClassEnum,
-#         'virtue': CharacterVirtueEnum,
-#         'flaw': CharacterFlawEnum,
-#     }
-
-#     enum_member = enum_mapping.get(key)
-
-#     if value and value not in enum_member:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-#                             detail=f"{value} is not a valid {key}")
-#     return value
+class CharacterBase(BaseModel):
+    name: str
+    class_: CharacterClassEnum
+    virtue: CharacterVirtueEnum
+    flaw: CharacterFlawEnum
+    
+    @field_validator("name")
+    def name_validator(cls, value: str):
+        if value.isspace() or value is None:
+            raise FieldsAreEmpty()
+        return value
+    
+class CharacterResponse(CharacterBase):
+    id: int
+    user_id: int
+    state: CharacterStateEnum
+    honor_points: int
+    map_level: int
+    times_reset: int
+    

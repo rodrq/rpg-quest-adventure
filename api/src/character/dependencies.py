@@ -1,19 +1,21 @@
-# from src.character.schemas import CharacterInDb
-# from src.character import service
-# from src.exceptions import 
-# async def valid_character_create(character_form: CharacterInDb) -> CharacterInDb:
-#     if await service.get_character_by_name(character_form.username):
-#         raise EmailTaken()
-
-#     return user
-
-# def get_current_character_username(token: str = Depends(oauth2_scheme)):
-#     character_name = decode_jwt_token_sub(token)
-#     return character_name
+from fastapi import Depends, Path
+from src.character.schemas import CharacterBase
+from src.character import service
+from src.character import exceptions
+from src.auth import jwt
 
 
-# def get_current_character(character_name: str = Depends(get_current_character_username)):
-#     character = get_character_query(username=character_name)
-#     if character is None:
-#         raise credentials_exception
-#     return character
+async def valid_character_create(character: CharacterBase):
+    if await service.get_character_by_name(character.name):
+        raise exceptions.CharacterNameTaken
+    return character
+
+async def valid_user_character_fetch(character_name: str = Path(), user_id: int = Depends(jwt.parse_jwt_user_data)):
+    if await service.get_user_character_by_name(character_name, user_id):
+        return character_name
+    raise exceptions.CharacterNotYours
+
+async def valid_user_character_delete(character_name: str = Path(), user_id: int = Depends(jwt.parse_jwt_user_data)):
+    if await service.get_user_character_by_name(character_name, user_id):
+        return character_name
+    raise exceptions.CharacterCantBeDeleted

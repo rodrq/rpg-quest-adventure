@@ -1,63 +1,67 @@
-# from typing import Any
-# from src.auth.jwt import create_access_token
-# from src.auth.security import get_hashed_password
-# from src.database import character, fetch_one
-# from src.character.schemas import CharacterInDb
-# from fastapi.responses import JSONResponse
-# from fastapi import HTTPException, status
-# from sqlalchemy.orm import Session
-# from sqlalchemy import func, insert
-
-# async def create_character(character_form: CharacterInDb) -> dict[str, Any] | None:
-#     insert_query = (
-#         insert(character)
-#         .values(
-#             {
-#                 "username": character_form.username,
-#                 "hashed_password": character_form.password,
-#                 "class_": character_form.class_,
-#                 "virtue": character_form.virtue,
-#                 "flaw": character_form.flaw,
-#             }
-#         )
-#         .returning(character)
-#     )
-
-#     return await fetch_one(insert_query)
-
-# # def get_character_query(username: str, db: Session):
-# #     queried_character = db.query(Character).filter(
-# #         func.lower(Character.username) == username.lower()).first()
-# #     return queried_character
+from src.database import fetch_one, fetch_all, execute
+from sqlalchemy import select, insert, delete, update
+from sqlalchemy.sql import text
+from src.character.models import Character
+from src.character.schemas import CharacterBase
 
 
-# # async def create_character_handler(create_character_params: CharacterInDb, db: Session):
-# #     try:
-# #         if get_character_query(create_character_params.username, db):
-# #             raise HTTPException(status.HTTP_409_CONFLICT,
-# #                                 detail="Character username already exists")
-# #         character = Character(
-# #             username=create_character_params.username,
-# #             hashed_password=get_hashed_password(
-# #                 create_character_params.password),
+async def create_character(character_form: CharacterBase, user_id: int) -> Character:
+    insert_query = (
+        insert(Character)
+        .values(
+            user_id = user_id,
+            name = character_form.name,
+            class_ = character_form.class_,
+            virtue = character_form.virtue,
+            flaw = character_form.flaw
+            
+        )
+        .returning(Character)
+    )
+    
+    return await fetch_one(insert_query)
 
-# #             class_=create_character_params.class_,
-# #             virtue=create_character_params.virtue,
-# #             flaw=create_character_params.flaw
-# #         )
 
-# #         db.add(character)
-# #         db.commit()
+async def get_characters_by_user_id(user_id: int):
+    select_query = select(Character).where(Character.user_id == user_id)
+    return await fetch_all(select_query)
 
-# #         token_data = {"sub": create_character_params.username}
-# #         access_token = create_access_token(token_data)
 
-# #         response = JSONResponse(content={"message": "Created character"})
-# #         response.set_cookie(key="access_token",
-# #                             value=f"Bearer {access_token}",
-# #                             httponly=True)
-# #         return response
+async def get_character_by_name(name: str):
+    select_query = select(Character).where(Character.name == name)
+    
+    return await fetch_one(select_query)
 
-# #     except Exception as e:
-# #         raise HTTPException(
-# #             status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
+
+async def get_user_character_by_name(character_name: str, user_id: int):
+    select_query = select(Character).where(
+        (Character.name == character_name) & (Character.user_id == user_id)
+    )
+    return await fetch_one(select_query)
+
+
+async def delete_character_by_name(character_name: str):
+    delete_query = delete(Character).where(Character.name == character_name)
+    return await execute(delete_query)
+    
+
+async def delete_user_character_by_name(character_name: str, user_id: int):
+    delete_query = delete(Character).where(
+        (Character.name == character_name) & (Character.user_id == user_id)
+    )
+    return await execute(delete_query)
+    
+
+
+async def update_character_by_name(character_name: str):
+    update_query = update(Character).where(Character.name == character_name).values(
+        state = "adventuring",
+        honor_points = 0,
+        map_level = 1,
+        times_reset = text("times_reset + 1"),
+    ).returning(Character)
+    
+    return await fetch_one(update_query)
+    
+    
+

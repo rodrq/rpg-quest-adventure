@@ -1,4 +1,4 @@
-from src.auth.constants import ErrorCode
+from src.constants import ErrorCode
 from src.exceptions import BadRequest, NotAuthenticated, PermissionDenied
 
 class FieldsAreEmpty(BadRequest):
