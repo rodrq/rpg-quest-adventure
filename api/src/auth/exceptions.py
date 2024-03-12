@@ -1,6 +1,7 @@
 from src.constants import ErrorCode
 from src.exceptions import BadRequest, NotAuthenticated, PermissionDenied
 
+
 class FieldsAreEmpty(BadRequest):
     DETAIL = ErrorCode.FIELDS_ARE_EMPTY
 
@@ -23,5 +24,3 @@ class InvalidCredentials(NotAuthenticated):
 
 class UsernameTaken(BadRequest):
     DETAIL = ErrorCode.USERNAME_TAKEN
-
-

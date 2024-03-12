@@ -1,15 +1,20 @@
 from typing import Any
-from sqlalchemy import (CursorResult, Select, Insert, Update, Delete)
+
+from sqlalchemy import CursorResult, Delete, Insert, Select, Update
 from sqlalchemy.ext.asyncio import create_async_engine
+
 from src.config import settings
 from src.models import Base
+
 DATABASE_URL = str(settings.DB_URL)
 
 engine = create_async_engine(DATABASE_URL)
 
-async def init_db():  
+
+async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
 
 async def fetch_one(select_query: Select | Insert | Update) -> dict[str, Any] | None:
     async with engine.begin() as conn:
