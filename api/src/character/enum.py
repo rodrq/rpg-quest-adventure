@@ -40,6 +40,3 @@ class CharacterFlawEnum(enum.Enum):
     impulsiveness = "impulsiveness"
     arrogance = "arrogance"
     
-class UserRoleEnum(str, enum.Enum):
-    user = "user"
-    admin = "admin"
