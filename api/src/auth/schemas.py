@@ -14,6 +14,8 @@ class UserForm(BaseModel):
 class UserResponse(BaseModel):
     id: int
     username: str
+    characters_ids: list[int] | None
+    current_character: str | None
     
 
 class JWTData(BaseModel):

@@ -19,7 +19,7 @@ async def create_user(user_form: UserForm = Depends(valid_username_create)) -> d
 
 
 @router.get("/user/me")
-async def get_my_user(user_id: Annotated[int, Depends(parse_jwt_user_data)]) -> UserResponse:
+async def get_my_user(user_id: int = Depends(parse_jwt_user_data)) -> UserResponse:
     user = await service.get_user_by_id(user_id)
     return UserResponse(**user)
 
