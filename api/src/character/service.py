@@ -1,6 +1,7 @@
 from src.database import fetch_one, fetch_all, execute
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.sql import text
+from src.auth.models import User
 from src.character.models import Character
 from src.character.schemas import CharacterBase
 
@@ -18,8 +19,16 @@ async def create_character(character_form: CharacterBase, user_id: int) -> Chara
         )
         .returning(Character)
     )
-    
     return await fetch_one(insert_query)
+    
+    
+async def update_users_character_list(character, user_id):
+    update_query = (
+            update(User)
+            .where(User.id == user_id)
+            .values(characters_ids=User.characters_ids + [character["id"]])
+        )
+    await execute(update_query)
 
 
 async def get_characters_by_user_id(user_id: int):
@@ -52,7 +61,6 @@ async def delete_user_character_by_name(character_name: str, user_id: int):
     return await execute(delete_query)
     
 
-
 async def update_character_by_name(character_name: str):
     update_query = update(Character).where(Character.name == character_name).values(
         state = "adventuring",
@@ -61,7 +69,13 @@ async def update_character_by_name(character_name: str):
         times_reset = text("times_reset + 1"),
     ).returning(Character)
     
-    return await fetch_one(update_query)
+    return await execute(update_query)
     
     
+async def update_selected_character_by_name(character_name: str):
+    update_query = update(User).where(Character.name == character_name).values(
+        current_character = character_name
+    ).returning(User)
+    
+    return await execute(update_query)
 

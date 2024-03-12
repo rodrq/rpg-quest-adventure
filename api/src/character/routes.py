@@ -6,14 +6,18 @@ from src.character.dependencies import valid_character_create, valid_user_charac
 from src.character import service
 
 
-router = APIRouter(prefix="/characters", tags=['Character creation'])
+router = APIRouter(prefix="/character", tags=['Character creation'])
 
 @router.post("/")
 async def create_character(character_form: CharacterBase = Depends(valid_character_create),
                            user_id: str = Depends(jwt.parse_jwt_user_data)):
     
-    character = await service.create_character(character_form, user_id)
-    return CharacterResponse(**character)
+    created_character = await service.create_character(character_form, user_id)
+    
+    #update users created_characters list
+    await service.update_users_character_list(created_character, user_id)
+    
+    return CharacterResponse(**created_character)
 
 
 @router.get("/")
@@ -28,7 +32,7 @@ async def get_own_character(character_name: str = Depends(valid_user_character_f
     return CharacterResponse(**character)
 
 
-@router.put("/{character_name}")
+@router.put("/reset/{character_name}")
 async def reset_own_character(character_name: str = Depends(valid_user_character_fetch)):
     character = await service.update_character_by_name(character_name)
     return CharacterResponse(**character)
@@ -40,3 +44,7 @@ async def delete_own_character(character_name: str = Depends(valid_user_characte
     return {"message": f"successfuly deleted character '{character_name}'"} #TODO better response
 
 
+@router.post("/select/{character_name}")
+async def set_user_selected_character(character_name: str = Depends(valid_user_character_fetch)):
+    selected_character = await service.update_selected_character_by_name(character_name)
+    return selected_character
