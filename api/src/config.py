@@ -6,8 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env.local", env_file_encoding="utf-8")
 
-    OPENAI_API_KEY: str
-    OPENAI_ORG_ID: str
+    GEMINI_API_KEY: str = None
+
     ALLOWED_CORS_ORIGINS: set[AnyUrl]
     ENVIRONMENT: str
 
