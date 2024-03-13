@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, field_validator
 
 from src.character.enum import CharacterClassEnum, CharacterFlawEnum, CharacterStateEnum, CharacterVirtueEnum
@@ -24,6 +26,7 @@ class CharacterResponse(CharacterBase):
     map_level: int
     times_reset: int
     completed_last_quest: bool
+    quests: List[int]
 
     class Config:
         use_enum_values = True

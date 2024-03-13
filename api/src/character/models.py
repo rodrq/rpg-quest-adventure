@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, func
+from sqlalchemy import ARRAY, Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, func
 
 from src.character.enum import CharacterClassEnum, CharacterFlawEnum, CharacterStateEnum, CharacterVirtueEnum
 from src.models import Base
@@ -22,6 +22,8 @@ class Character(Base):
 
     # tracker to check if last generated quest was completed. Default True so you can generate the first one
     completed_last_quest = Column(Boolean, default=True)
+
+    quests = Column(ARRAY(Integer), default=None)
 
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, onupdate=func.now())
