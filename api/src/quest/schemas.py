@@ -1,5 +1,7 @@
 from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
+
 
 class ApproachGameResponse(BaseModel):
     choice_description: str
@@ -12,13 +14,13 @@ class NestedApproaches(BaseModel):
 
 
 class QuestResponse(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-    quest_id: int
+    id: int
     title: str
     description: str
-    character_username: str
     approaches: NestedApproaches
-    selected_approach: Optional[int]
+    character_name: str
+    character_map_level: int
+    selected_approach: int | None
 
 
 class Approach(BaseModel):

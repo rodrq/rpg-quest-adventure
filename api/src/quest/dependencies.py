@@ -1,12 +1,35 @@
-from fastapi import Depends
-from src.auth.jwt import parse_jwt_user_data
+from fastapi import Depends, Path
+
+from src.auth import jwt
+from src.auth import service as auth_service
+from src.character import service as character_service
+from src.character.schemas import CharacterResponse
+from src.quest import service
+from src.quest.exceptions import (
+    CharacterStateDead,
+    CharacterStateWinner,
+    EmptySelectedCharacter,
+    LastQuestNotCompleted,
+)
 
 
-# def get_current_character(user_id: int = Depends(parse_jwt_user_data)):
-#     current_character = 
-#     pass
+async def get_user_selected_character(user_id: int = Depends(jwt.parse_jwt_user_data)):
+    user = await auth_service.get_user_by_id(user_id)
+    return user["selected_character"]
 
 
-# def valid_create_quest(current_character: str = Depends(get_current_character)):
-#     pass
+async def valid_game_character(character: str = Depends(get_user_selected_character)) -> CharacterResponse:
+    character = await character_service.get_character(character["name"])
+    if not character:
+        raise EmptySelectedCharacter()
 
+    if character["state"] == "winner":
+        raise CharacterStateWinner()
+
+    if character["state"] == "dead":
+        raise CharacterStateDead()
+
+    if character["completed_last_quest"] is False:
+        raise LastQuestNotCompleted()
+
+    return CharacterResponse(**character)
