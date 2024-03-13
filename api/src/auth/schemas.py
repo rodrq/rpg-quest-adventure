@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from pydantic import BaseModel, Field, field_validator
 
 from src.auth.exceptions import FieldsAreEmpty
@@ -17,9 +19,9 @@ class UserForm(BaseModel):
 class UserResponse(BaseModel):
     id: int
     username: str
-    characters_ids: list[int] | None
-    current_character: str | None
     is_admin: bool
+    characters: List[str] | None = []
+    selected_character: Optional[str] = None
 
 
 class JWTData(BaseModel):

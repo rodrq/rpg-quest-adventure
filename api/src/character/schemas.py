@@ -18,9 +18,12 @@ class CharacterBase(BaseModel):
 
 
 class CharacterResponse(CharacterBase):
-    id: int
     user_id: int
     state: CharacterStateEnum
-    honor_points: int
+    valor_points: int
     map_level: int
     times_reset: int
+    completed_last_quest: bool
+
+    class Config:
+        use_enum_values = True

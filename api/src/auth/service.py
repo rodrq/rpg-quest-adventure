@@ -1,5 +1,3 @@
-from typing import Any
-
 from sqlalchemy import insert, select
 
 from src.auth.exceptions import InvalidCredentials
@@ -35,7 +33,7 @@ async def get_user_by_username(username: str):
     return await fetch_one(select_query)
 
 
-async def get_user_by_id(user_id: int) -> dict[str, Any] | None:
+async def get_user_by_id(user_id: int) -> User | None:
     select_query = select(User).where(User.id == user_id)
 
     return await fetch_one(select_query)
