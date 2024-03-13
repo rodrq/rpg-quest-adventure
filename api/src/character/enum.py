@@ -1,13 +1,13 @@
-import enum
+from enum import Enum
 
 
-class CharacterStateEnum(str, enum.Enum):
+class CharacterStateEnum(str, Enum):
     dead = "dead"
     winner = "winner"
     adventuring = "adventuring"
 
 
-class CharacterClassEnum(enum.Enum):
+class CharacterClassEnum(str, Enum):
     warrior = "warrior"
     mage = "mage"
     barbarian = "barbarian"
@@ -20,7 +20,7 @@ class CharacterClassEnum(enum.Enum):
     archer = "archer"
 
 
-class CharacterVirtueEnum(enum.Enum):
+class CharacterVirtueEnum(str, Enum):
     courage = "courage"
     honor = "honor"
     compassion = "compassion"
@@ -31,7 +31,7 @@ class CharacterVirtueEnum(enum.Enum):
     humility = "humility"
 
 
-class CharacterFlawEnum(enum.Enum):
+class CharacterFlawEnum(str, Enum):
     cowardice = "cowardice"
     greed = "greed"
     dishonesty = "dishonesty"

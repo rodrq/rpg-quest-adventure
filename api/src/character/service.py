@@ -1,4 +1,4 @@
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.sql import text
 
 from src.auth.models import User
@@ -22,65 +22,65 @@ async def create_character(character_form: CharacterBase, user_id: int) -> Chara
     return await fetch_one(insert_query)
 
 
-async def update_users_character_list(character, user_id):
+async def add_to_users_character_list(character_name, user_id):
     update_query = (
-        update(User).where(User.id == user_id).values(characters_ids=User.characters_ids + [character["id"]])
+        update(User).where(User.id == user_id).values(characters=User.characters + [character_name])
     )
     await execute(update_query)
 
 
-async def get_characters_by_user_id(user_id: int):
+async def delete_from_users_character_list(character_name, user_id):
+    update_query = (
+        update(User)
+        .where(User.id == user_id)
+        .values(characters=func.array_remove(User.characters, character_name))
+    )
+    await execute(update_query)
+
+
+async def get_all_user_characters(user_id: int):
     select_query = select(Character).where(Character.user_id == user_id)
     return await fetch_all(select_query)
 
 
-async def get_character_by_name(name: str):
+async def get_character(name: str) -> Character | None:
     select_query = select(Character).where(Character.name == name)
 
     return await fetch_one(select_query)
 
 
-async def get_user_character_by_name(character_name: str, user_id: int):
+async def get_user_character(character_name: str, user_id: int):
     select_query = select(Character).where(
         (Character.name == character_name) & (Character.user_id == user_id)
     )
     return await fetch_one(select_query)
 
 
-async def delete_character_by_name(character_name: str):
+async def delete_character(character_name: str):
     delete_query = delete(Character).where(Character.name == character_name)
     return await execute(delete_query)
 
 
-async def delete_user_character_by_name(character_name: str, user_id: int):
-    delete_query = delete(Character).where(
-        (Character.name == character_name) & (Character.user_id == user_id)
-    )
-    return await execute(delete_query)
-
-
-async def update_character_by_name(character_name: str):
+async def reset_character_by_name(character_name: str):
     update_query = (
         update(Character)
         .where(Character.name == character_name)
         .values(
             state="adventuring",
-            honor_points=0,
+            valor_points=0,
             map_level=1,
             times_reset=text("times_reset + 1"),
+            completed_last_quest=False,
         )
         .returning(Character)
     )
 
-    return await execute(update_query)
+    return await fetch_one(update_query)
 
 
-async def update_selected_character_by_name(character_name: str):
+async def update_user_selected_character(character_name: str | None, user_id: int):
     update_query = (
-        update(User)
-        .where(Character.name == character_name)
-        .values(current_character=character_name)
-        .returning(User)
-    )
+        update(User).where(User.id == user_id).values(selected_character=character_name).returning(User)
+    ).returning(User)
 
-    return await execute(update_query)
+    return await fetch_one(update_query)

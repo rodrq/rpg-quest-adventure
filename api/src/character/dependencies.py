@@ -6,7 +6,8 @@ from src.character.schemas import CharacterBase
 
 
 async def valid_character_create(character: CharacterBase):
-    if await service.get_character_by_name(character.name):
+    # Checks if character name is taken
+    if await service.get_character(character.name):
         raise exceptions.CharacterNameTaken
     return character
 
@@ -14,14 +15,8 @@ async def valid_character_create(character: CharacterBase):
 async def valid_user_character_fetch(
     character_name: str = Path(), user_id: int = Depends(jwt.parse_jwt_user_data)
 ):
-    if await service.get_user_character_by_name(character_name, user_id):
-        return character_name
-    raise exceptions.CharacterNotYours
-
-
-async def valid_user_character_delete(
-    character_name: str = Path(), user_id: int = Depends(jwt.parse_jwt_user_data)
-):
-    if await service.get_user_character_by_name(character_name, user_id):
-        return character_name
-    raise exceptions.CharacterCantBeDeleted
+    # Checks if character exists and if it's owned by the requester
+    character = await service.get_user_character(character_name, user_id)
+    if not character:
+        raise exceptions.CharacterNotFound
+    return character

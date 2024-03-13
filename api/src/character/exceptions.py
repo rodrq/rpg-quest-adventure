@@ -1,5 +1,5 @@
 from src.constants import ErrorCode
-from src.exceptions import BadRequest
+from src.exceptions import BadRequest, NotFound
 
 
 class FieldsAreEmpty(BadRequest):
@@ -14,5 +14,5 @@ class CharacterCantBeDeleted(BadRequest):
     DETAIL = ErrorCode.CHARACTER_CANT_BE_DELETED
 
 
-class CharacterNotYours(BadRequest):
-    DETAIL = ErrorCode.CHARACTER_NOT_YOURS
+class CharacterNotFound(NotFound):
+    DETAIL = ErrorCode.CHARACTER_NOT_FOUND
