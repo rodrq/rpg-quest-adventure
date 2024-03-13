@@ -24,3 +24,7 @@ class QuestBelongsToAnotherCharacter(BadRequest):
 
 class QuestNotFound(NotFound):
     DETAIL = ErrorCode.QUEST_NOT_FOUND
+
+
+class InvalidApproachChoice(BadRequest):
+    DETAIL = ErrorCode.INVALID_CHOSEN_APPROACH

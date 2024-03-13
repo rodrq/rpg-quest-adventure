@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Path
 
 from src.character.schemas import CharacterResponse
 from src.quest import service
-from src.quest.dependencies import get_user_selected_character, valid_game_character
+from src.quest.dependencies import get_user_selected_character, valid_approach_number, valid_game_character
 from src.quest.schemas import QuestResponse
 
 router = APIRouter(prefix="/quest", tags=["Quest endpoints"])
@@ -11,9 +11,9 @@ router = APIRouter(prefix="/quest", tags=["Quest endpoints"])
 @router.post("/create")
 async def create_quest(character: CharacterResponse = Depends(valid_game_character)):
     quest = await service.generate_quest(character)
-    # updates characters completed_last_quest to True to track if last_quest was completed
-    # before generatin another one.
-    await service.update_characters_completed_last_quest(character.name, True)
+    # updates characters completed_last_quest to False.
+    # updates character quests = Column(ARRAY(String, ForeignKey("quests.id"))
+    await service.post_quest_creation_updates(character.name, quest)
     return QuestResponse(**quest)
 
 
@@ -31,3 +31,8 @@ async def get_quest(selected_character: str = Depends(get_user_selected_characte
         # if quest not finished, hide important game data
         return QuestResponse(**quest)
     return quest
+
+
+# @router.post("/play/{quest_id}/{approach_number}")
+# async def choose_approach(quest=Depends(), approach_number: int = Depends(valid_approach_number)):
+#     pass

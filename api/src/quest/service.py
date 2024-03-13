@@ -3,8 +3,9 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
 import google.generativeai as genai
+import json_repair
 import orjson
-from sqlalchemy import insert, select, update
+from sqlalchemy import ARRAY, Integer, func, insert, select, update
 
 from src.character.models import Character
 from src.character.schemas import CharacterResponse
@@ -40,8 +41,11 @@ async def generate_quest(character: CharacterResponse) -> Quest:
     loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor()
     response = await loop.run_in_executor(executor, generate_content_sync)
+    print(response.text)
 
-    result = orjson.loads(response.text)
+    # LLMs sometimes generate markdown template, or add some unnecesary comma so we fix.
+    decoded_result = json_repair.repair_json(response.text, skip_json_loads=True)
+    result = orjson.loads(decoded_result)
     insert_query = (
         insert(Quest)
         .values(
@@ -61,9 +65,17 @@ async def get_all_quests(current_character: str) -> List[Quest]:
     return await fetch_all(select_query)
 
 
-async def update_characters_completed_last_quest(character_name: str, value: bool) -> None:
+async def post_quest_creation_updates(character_name: str, quest) -> None:
+    """Updates Character.completed_last_quest to False since we just created a quest.
+    Also updates Character.quests list of fks quest ids"""
+    print(character_name, quest)
     update_query = (
-        update(Character).where(Character.name == character_name).values(completed_last_quest=value)
+        update(Character)
+        .where(Character.name == character_name)
+        .values(
+            completed_last_quest=False,
+            quests=Character.quests + [quest["id"]],
+        )
     )
     return await execute(update_query)
 

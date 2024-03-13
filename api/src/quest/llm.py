@@ -1,6 +1,7 @@
 def create_quest_prompt(name: str, class_: str, quest_map: str, virtue: str, flaw: str):
-    system_prompt = """Respond in JSON format, without markdown formatting (just plain text.).
-        You are the gamemaster of a RPG game, and you will create a quest for the player in JSON format.
+    system_prompt = """Respond with a string to be parsed to JSON, strings enclosed with double quotes and
+    without any markdown formatting (just plain text.).
+        You are the gamemaster of a RPG game, and your task is to create a quest for the player.
         The quest should include a challenge and three possible ways the player could overcome it.
         Each approach will have a chance of success, where the higher the risk of failing, the more daring the feat.
         Please structure the output as follows:
