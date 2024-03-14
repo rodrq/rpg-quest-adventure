@@ -3,22 +3,30 @@ from typing import Any, List
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.orm import joinedload
 
+from src.auth import service as auth_service
 from src.auth.models import User
 from src.character.exceptions import BadRequest
 from src.character.models import Character
 from src.character.schemas import CharacterBase, CharacterSchema
 from src.database import execute, fetch_all, fetch_one
+from src.quest import service as quest_service
 
 
 async def create_character(character_form: CharacterBase, user_id: int) -> CharacterSchema:
-    insert_query = insert(Character).values(
-        user_id=user_id,
-        name=character_form.name,
-        class_=character_form.class_,
-        virtue=character_form.virtue,
-        flaw=character_form.flaw,
+    insert_query = (
+        insert(Character)
+        .values(
+            user_id=user_id,
+            name=character_form.name,
+            class_=character_form.class_,
+            virtue=character_form.virtue,
+            flaw=character_form.flaw,
+        )
+        .returning(Character)
     )
     character = await fetch_one(insert_query)
+    # set just created character as user's selected_character
+    await auth_service.update_value(user_id, "selected_character", character["name"])
     return CharacterSchema(**character)
 
 
