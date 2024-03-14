@@ -110,3 +110,9 @@ async def update_game_variables(
     await execute(character_query)
     await execute(quest_query)
     return {"message": "character states updated"}
+
+
+async def orphan_quests(character_name: str):
+    orphan_quests = update(Quest).where(Quest.character_name == character_name).values(character_name=None)
+    await execute(orphan_quests)
+    return {"status": 200, "message": "success"}

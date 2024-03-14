@@ -69,7 +69,8 @@ async def reset_character(character: CharacterSchema):
         "times_reset": Character.times_reset + 1,
     }
 
-    return await update_character_multiple(character.name, factory_settings_character)
+    await update_character_multiple(character.name, factory_settings_character)
+    return await quest_service.orphan_quests(character.name)
 
 
 async def update_character_value(
