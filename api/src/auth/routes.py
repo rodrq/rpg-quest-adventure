@@ -4,7 +4,8 @@ from fastapi.responses import Response
 from src.auth import jwt, service
 from src.auth.dependencies import valid_username_create
 from src.auth.jwt import parse_jwt_user_data
-from src.auth.schemas import AccessTokenResponse, UserForm, UserResponse
+from src.auth.models import User
+from src.auth.schemas import AccessTokenResponse, UserForm, UserFullData
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
@@ -16,9 +17,11 @@ async def create_user(user_form: UserForm = Depends(valid_username_create)) -> d
 
 
 @router.get("/user/me")
-async def get_my_user(user_id: int = Depends(parse_jwt_user_data)) -> UserResponse:
-    user = await service.get_user_by_id(user_id)
-    return UserResponse(**user)
+async def get_user_joined_data(user_id: int = Depends(parse_jwt_user_data)) -> UserFullData:
+    # Joined load all characters with FK user_id.
+    user: User = await service.get_user_rel_joined_data(user_id)
+    created_characters = [char["name"] for char in user if char["name"] is not None]
+    return UserFullData(**user[0], created_characters=created_characters)
 
 
 @router.post("/login")
