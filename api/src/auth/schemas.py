@@ -20,8 +20,14 @@ class UserResponse(BaseModel):
     id: int
     username: str
     is_admin: bool
-    characters: List[str] | None = []
     selected_character: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class UserFullData(UserResponse):
+    created_characters: List[str] | None = None
 
 
 class JWTData(BaseModel):
