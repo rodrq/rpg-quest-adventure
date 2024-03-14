@@ -5,13 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from psycopg_pool import AsyncConnectionPool
 
 from src.config import app_configs, get_conn_str, settings
-from src.database import init_db
 from src.router import router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
     app.async_pool = AsyncConnectionPool(conninfo=get_conn_str())
     yield
     await app.async_pool.close()

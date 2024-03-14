@@ -1,7 +1,7 @@
 from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
 
-from src.models import Base
+from src.database import Base
 
 
 class Quest(Base):

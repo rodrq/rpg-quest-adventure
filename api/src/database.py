@@ -1,19 +1,23 @@
 from typing import Any
 
-from sqlalchemy import CursorResult, Delete, Insert, Select, Update
+from sqlalchemy import CursorResult, Delete, Insert, MetaData, Select, Update
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.declarative import declarative_base
 
 from src.config import settings
-from src.models import Base
+from src.constants import POSTGRES_INDEXES_NAMING_CONVENTION
+
+metadata = MetaData(naming_convention=POSTGRES_INDEXES_NAMING_CONVENTION)
+
+Base = declarative_base(metadata=metadata)
 
 DATABASE_URL = str(settings.DB_URL)
 
-engine = create_async_engine(DATABASE_URL)
-
-
-async def init_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=True,
+    future=True,
+)
 
 
 async def fetch_one(select_query: Select | Insert | Update) -> dict[str, Any] | None:
