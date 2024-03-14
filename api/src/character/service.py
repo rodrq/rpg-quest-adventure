@@ -90,4 +90,6 @@ async def update_character_value(
 
 async def update_character_multiple(character_name: str, update_values: dict[str, Any]):
     update_query = update(Character).where(Character.name == character_name).values(**update_values)
-    return await execute(update_query)
+    await execute(update_query)
+
+    return {"status": 200, "message": "success"}

@@ -46,7 +46,8 @@ async def success_roll(
         "selected_approach": approach_number,
         "survived": True,
     }
-    return await service.update_game_variables(character, character_updates, quest, quest_updates)
+    await service.update_game_variables(character, character_updates, quest, quest_updates)
+    return {"status": "success", "message": chosen_approach.success_description}
 
 
 async def failure_roll(
@@ -62,4 +63,5 @@ async def failure_roll(
         "survived": False,
     }
 
-    return await service.update_game_variables(character, character_updates, quest, quest_updates)
+    await service.update_game_variables(character, character_updates, quest, quest_updates)
+    return {"status": "failure", "message": chosen_approach.failure_description}
