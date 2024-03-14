@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from pydantic import BaseModel, field_validator
 
@@ -19,14 +19,17 @@ class CharacterBase(BaseModel):
         return value
 
 
-class CharacterResponse(CharacterBase):
+class CharacterSchema(CharacterBase):
     user_id: int
     state: CharacterStateEnum
     valor_points: int
     map_level: int
     times_reset: int
     completed_last_quest: bool
-    quests: List[int]
 
     class Config:
         use_enum_values = True
+
+
+class CharacterWithQuests(CharacterSchema):
+    quests: List[dict[str, Any]] | None = None
