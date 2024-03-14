@@ -11,8 +11,12 @@ router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 
 @router.post("/user")
-async def create_user(user_form: UserForm = Depends(valid_username_create)) -> dict[str, str]:
+async def create_user(
+    response: Response, user_form: UserForm = Depends(valid_username_create)
+) -> dict[str, str]:
     user = await service.create_user(user_form)
+    access_token_value = jwt.create_access_token(user_id=user["id"])
+    response.set_cookie(key="access_token", value=access_token_value, httponly=True)
     return {"message": "success", "created": user["username"]}
 
 
