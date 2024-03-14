@@ -46,5 +46,5 @@ async def get_selected_character(user_id: int = Depends(jwt.parse_jwt_user_data)
     user = await auth_service.get_user_by_id(user_id)
     if not user.get("selected_character"):
         raise EmptySelectedCharacter()
-    character = await service.get_character(user.get("selected_character"))
+    character = await service.get_character(user["selected_character"])
     return CharacterSchema(**character)

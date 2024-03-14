@@ -35,7 +35,8 @@ async def get_own_character(character: CharacterWithQuests = Depends(get_charact
 
 @router.put("/reset/{character_name}")
 async def reset_own_character(character: CharacterSchema = Depends(get_valid_auth_character)):
-    return await service.reset_character(character)
+    await service.reset_character(character)
+    return {"status": 200, "message": "success", "times_reset": character.times_reset + 1}
 
 
 # TODO SELECTED CHARACTER TO NULL IF ==
@@ -45,11 +46,8 @@ async def delete_own_character(
     user_id: int = Depends(jwt.parse_jwt_user_data),
 ):
     await service.delete_character(character.name)
-
+    await auth_service.update_value(user_id, "selected_character", None)
     return {"message": f"successfuly deleted character '{character.name}'"}  # TODO better response
-
-
-# await auth_service.delete_value(user_id, column_name=character.name, column_key=user_id, from_list=True)
 
 
 @router.put("/select/{character_name}")
@@ -57,7 +55,8 @@ async def update_user_selected_character(
     user_id: int = Depends(jwt.parse_jwt_user_data),
     character: CharacterSchema = Depends(get_valid_auth_character),
 ):
-    return await auth_service.update_value(user_id, "selected_character", character.name)
+    await auth_service.update_value(user_id, "selected_character", character.name)
+    return {"status": 200, "message": "success"}
 
 
 # TODO GET_JOURNEY FOR RANKING AND STUFF
