@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import Cookie
 from jose import JWTError, jwt
@@ -9,7 +9,7 @@ from src.config import settings
 
 
 def create_access_token(user_id: int, expires_delta=timedelta(hours=auth_config.JWT_EXP)):
-    jwt_data = {"sub": str(user_id), "exp": datetime.utcnow() + expires_delta}
+    jwt_data = {"sub": str(user_id), "exp": datetime.now(timezone.utc) + expires_delta}
     access_token = jwt.encode(jwt_data, settings.JWT_SECRET, auth_config.JWT_ALG)
     return access_token
 
