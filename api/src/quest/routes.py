@@ -1,38 +1,52 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends
 
-from src.character.schemas import CharacterResponse
-from src.quest import service
-from src.quest.dependencies import get_user_selected_character, valid_approach_number, valid_game_character
-from src.quest.schemas import QuestResponse
+from src.character import service as character_service
+from src.character.dependencies import get_selected_character
+from src.character.schemas import CharacterSchema
+from src.quest import game, service
+from src.quest.dependencies import (
+    fetch_quest_from_path_id,
+    valid_quest_post,
+)
+from src.quest.exceptions import CharacterStateDead, CharacterStateWinner, QuestAlreadyCompleted
+from src.quest.schemas import QuestResponse, SecretQuestResponse
 
 router = APIRouter(prefix="/quest", tags=["Quest endpoints"])
 
 
 @router.post("/create")
-async def create_quest(character: CharacterResponse = Depends(valid_game_character)):
+async def create_quest(character: CharacterSchema = Depends(valid_quest_post)):
     quest = await service.generate_quest(character)
     # updates characters completed_last_quest to False.
-    # updates character quests = Column(ARRAY(String, ForeignKey("quests.id"))
-    await service.post_quest_creation_updates(character.name, quest)
-    return QuestResponse(**quest)
+    await character_service.update_character_multiple(character.name, {"completed_last_quest": False})
+    return SecretQuestResponse(**quest)
 
 
 @router.get("/")
-async def get_quests(selected_character: str = Depends(get_user_selected_character)):
-    quests = await service.get_all_quests(selected_character)
+async def get_quests(selected_character: CharacterSchema = Depends(get_selected_character)):
+    quests: QuestResponse = await service.get_all_quests(selected_character)
     # if quest not finished, hide important game data
-    return [QuestResponse(**quest) if quest["selected_approach"] is None else quest for quest in quests]
+    return [SecretQuestResponse(**quest) if quest.selected_approach is None else quest for quest in quests]
 
 
 @router.get("/{quest_id}")
-async def get_quest(selected_character: str = Depends(get_user_selected_character), quest_id: int = Path()):
-    quest = await service.get_selected_character_quest(selected_character, quest_id)
+async def get_quest(quest: QuestResponse = Depends(fetch_quest_from_path_id)):
     if not quest["selected_approach"]:
         # if quest not finished, hide important game data
-        return QuestResponse(**quest)
+        return SecretQuestResponse(**quest)
     return quest
 
 
-# @router.post("/play/{quest_id}/{approach_number}")
-# async def choose_approach(quest=Depends(), approach_number: int = Depends(valid_approach_number)):
-#     pass
+@router.post("/play/{quest_id}/{approach_number}")
+async def play_quest_approach(
+    approach_number: int,
+    quest: QuestResponse = Depends(fetch_quest_from_path_id),
+    character: CharacterSchema = Depends(get_selected_character),
+):
+    if character.state == "dead":
+        raise CharacterStateDead
+    if character.state == "winner":
+        raise CharacterStateWinner
+    if isinstance(quest.survived, bool):
+        raise QuestAlreadyCompleted
+    return await game.roll_approach(approach_number, quest, character)

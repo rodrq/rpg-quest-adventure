@@ -1,24 +1,11 @@
+from datetime import datetime
+from typing import Optional
+
 from pydantic import BaseModel
 
 
-class ApproachGameResponse(BaseModel):
+class SecretApproach(BaseModel):
     choice_description: str
-
-
-class NestedApproaches(BaseModel):
-    approach_1: ApproachGameResponse
-    approach_2: ApproachGameResponse
-    approach_3: ApproachGameResponse
-
-
-class QuestResponse(BaseModel):
-    id: int
-    title: str
-    description: str
-    approaches: NestedApproaches
-    character_name: str
-    character_map_level: int
-    selected_approach: int | None
 
 
 class Approach(BaseModel):
@@ -26,3 +13,30 @@ class Approach(BaseModel):
     success_description: str
     failure_description: str
     chance_of_success: int
+
+
+class SecretApproaches(BaseModel):
+    approach_1: SecretApproach
+    approach_2: SecretApproach
+    approach_3: SecretApproach
+
+
+class Approaches(BaseModel):
+    approach_1: Approach
+    approach_2: Approach
+    approach_3: Approach
+
+
+class SecretQuestResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    approaches: SecretApproaches
+    character_name: str
+    selected_approach: Optional[int]
+
+
+class QuestResponse(SecretQuestResponse):
+    approaches: Approaches
+    survived: Optional[bool]
+    created_at: datetime
