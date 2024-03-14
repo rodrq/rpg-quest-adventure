@@ -2,10 +2,6 @@ from src.constants import ErrorCode
 from src.exceptions import BadRequest, NotFound
 
 
-class EmptySelectedCharacter(BadRequest):
-    DETAIL = ErrorCode.EMPTY_SELECTED_CHARACTER
-
-
 class CharacterStateWinner(BadRequest):
     DETAIL = ErrorCode.CHARACTER_STATE_WINNER
 
@@ -28,3 +24,7 @@ class QuestNotFound(NotFound):
 
 class InvalidApproachChoice(BadRequest):
     DETAIL = ErrorCode.INVALID_CHOSEN_APPROACH
+
+
+class QuestAlreadyCompleted(BadRequest):
+    DETAIL = ErrorCode.QUEST_ALREADY_COMPLETED

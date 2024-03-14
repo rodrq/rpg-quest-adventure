@@ -16,3 +16,11 @@ class CharacterCantBeDeleted(BadRequest):
 
 class CharacterNotFound(NotFound):
     DETAIL = ErrorCode.CHARACTER_NOT_FOUND
+
+
+class EmptySelectedCharacter(BadRequest):
+    DETAIL = ErrorCode.EMPTY_SELECTED_CHARACTER
+
+
+class NotYourCurrentSelectedCharacter(BadRequest):
+    DETAIL = ErrorCode.NOT_YOUR_SELECTED_CHARACTER
