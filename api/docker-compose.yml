@@ -1,13 +1,40 @@
-version: "3.8"
-name: rpg-quest
+version: '3.8'
+
 services:
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_DB: rpg
-      POSTGRES_USER: rodrq
-      POSTGRES_PASSWORD: rodrq
+  backend:
+    container_name: rpg_quest_backend
+    image: backend
+    env_file:
+      - .env.local
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ./:/src
     ports:
-      - 5432:5432
+      - "8000:8000"
+    depends_on:
+      - database
+  database:
+    container_name: rpg_quest_db
+    hostname: rpg
+    env_file:
+    - .env.local
+    image: library/postgres:16
+    volumes:
+      - app_pg_data:/var/lib/postgresql/data
+      - app_pg_data_backups:/backups
+      - ./scripts/postgres:/scripts
+    ports:
+      - "5432:5432"
+
+volumes:
+  app_pg_data:
+    driver: "local"
+  app_pg_data_backups:
+    driver: "local"
+
+networks:
+  default:
+    external: true
+    name: app_main

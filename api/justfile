@@ -1,0 +1,17 @@
+default:
+  just --list
+
+exec *args:
+  docker-compose exec backend {{args}}
+
+reset_dbbackup:
+  docker compose exec database scripts/backup
+
+mount-docker-backup *args:
+  docker cp database:/backups/{{args}} ./{{args}}
+
+restore *args:
+    docker compose exec database scripts/restore {{args}}
+
+test *args:
+    docker compose exec backend pytest {{args}}

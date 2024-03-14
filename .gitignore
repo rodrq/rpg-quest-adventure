@@ -9,9 +9,7 @@ todo.md
 test.py
 __pycache__
 api/data
-test
 .pylintrc
-Dockerfile
 .dockerignore
 docker-compose.yml
 api/fly.toml
