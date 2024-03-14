@@ -60,8 +60,8 @@ async def generate_quest(character: CharacterSchema) -> Quest:
     return await fetch_one(insert_query)
 
 
-async def get_all_quests(current_character: str) -> List[QuestResponse]:
-    select_query = select(Quest).where(Quest.character_name == current_character)
+async def get_all_quests(selected_character: CharacterSchema) -> List[QuestResponse]:
+    select_query = select(Quest).where(Quest.character_name == selected_character.name)
     return await fetch_all(select_query)
 
 
