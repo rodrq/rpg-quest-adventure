@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from src.character.enum import CharacterClassEnum, CharacterFlawEnum, CharacterStateEnum, CharacterVirtueEnum
 from src.character.exceptions import FieldsAreEmpty
@@ -27,8 +27,7 @@ class CharacterSchema(CharacterBase):
     times_reset: int
     completed_last_quest: bool
 
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class CharacterWithQuests(CharacterSchema):

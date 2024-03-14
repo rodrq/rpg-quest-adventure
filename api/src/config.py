@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env.local", env_file_encoding="utf-8")
 
-    GEMINI_API_KEY: str = None
+    GEMINI_API_KEY: str
 
     ALLOWED_CORS_ORIGINS: set[AnyUrl]
     ENVIRONMENT: str
@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_HOST: str
-    POSTGRES_PORT: str
+    POSTGRES_PORT: int
 
 
 settings = Settings()
@@ -36,6 +36,6 @@ def get_conn_str():
 
 app_configs = {"title": "RPG Quest API"}
 
-if Settings().ENVIRONMENT != "local":
+if settings.ENVIRONMENT != "local":
     # If not on local hides /docs
     app_configs["openapi_url"] = None

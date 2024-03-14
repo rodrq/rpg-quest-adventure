@@ -2,7 +2,7 @@ from typing import Any
 
 from sqlalchemy import CursorResult, Delete, Insert, MetaData, Select, Update
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 from src.config import settings
 from src.constants import POSTGRES_INDEXES_NAMING_CONVENTION
