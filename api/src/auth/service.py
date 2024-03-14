@@ -1,42 +1,49 @@
 from typing import Any, List
 
+from fastapi.responses import Response
 from sqlalchemy import func, insert, select, update
 from sqlalchemy.orm import joinedload
 
+from src.auth import jwt
 from src.auth.exceptions import InvalidCredentials
 from src.auth.models import User
-from src.auth.schemas import UserForm
+from src.auth.schemas import UserBase, UserForm
 from src.auth.security import check_password, hash_password
 from src.database import execute, fetch_all, fetch_one
 
 
-async def create_user(user_form: UserForm):
+async def create_user(user_form: UserForm) -> UserBase:
     insert_query = (
         insert(User)
         .values(username=user_form.username, hashed_password=hash_password(user_form.password))
         .returning(User)
     )
 
-    return await fetch_one(insert_query)
+    user = await fetch_one(insert_query)
+    return UserBase(**user)
 
 
-async def authenticate_user(user_form: UserForm):
+async def set_cookie_handler(user: UserBase, response: Response):
+    access_token_value = jwt.create_access_token(user_id=user.id)
+    return response.set_cookie(key="access_token", value=access_token_value, httponly=True)
+
+
+async def authenticate_user(user_form: UserForm) -> UserBase:
     user = await get_user_by_username(user_form.username)
     if not user:
         raise InvalidCredentials()
     if not check_password(user_form.password, user["hashed_password"]):
         raise InvalidCredentials()
-    print(user)
-    return User(**user)
+    return UserBase(**user)
 
 
-async def get_user_by_username(username: str):
+async def get_user_by_username(username: str) -> dict[str, Any] | None:
     select_query = select(User).where(User.username == username)
 
     return await fetch_one(select_query)
 
 
-async def get_user_by_id(user_id: int) -> User | None:
+async def get_user_by_id(user_id: int) -> dict[str, Any] | None:
     select_query = select(User).where(User.id == user_id)
     return await fetch_one(select_query)
 

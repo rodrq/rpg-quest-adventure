@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, field_validator
 
 from src.auth.exceptions import FieldsAreEmpty
 
@@ -16,23 +17,15 @@ class UserForm(BaseModel):
         return value
 
 
-class UserResponse(BaseModel):
+class UserBase(BaseModel):
     id: int
     username: str
     is_admin: bool
     selected_character: Optional[str] = None
-
-    class Config:
-        from_attributes = True
-
-
-class UserFullData(UserResponse):
     created_characters: List[str] | None = None
 
 
-class JWTData(BaseModel):
-    user_id: int = Field(alias="sub")
-
-
-class AccessTokenResponse(BaseModel):
-    access_token: str
+class UserModel(UserBase):
+    hashed_password: bytes
+    created_at: datetime
+    updated_at: datetime
