@@ -1,4 +1,5 @@
-from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, LargeBinary, String, func
+from sqlalchemy import Boolean, Column, DateTime, Integer, LargeBinary, String, func
+from sqlalchemy.orm import relationship
 
 from src.models import Base
 
@@ -12,5 +13,5 @@ class User(Base):
     is_admin = Column(Boolean, server_default="false", nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, onupdate=func.now())
-    characters = Column(ARRAY(String, ForeignKey("characters.name")), default=None)
-    selected_character = Column(String, default=None)  # TODO
+    characters = relationship("Character", back_populates="user")
+    selected_character = Column(String, default=None)
