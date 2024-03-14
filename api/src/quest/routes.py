@@ -24,16 +24,19 @@ async def create_quest(character: CharacterSchema = Depends(valid_quest_post)):
 
 @router.get("/")
 async def get_quests(selected_character: CharacterSchema = Depends(get_selected_character)):
-    quests: QuestResponse = await service.get_all_quests(selected_character)
+    quests = await service.get_all_quests(selected_character)
     # if quest not finished, hide important game data
-    return [SecretQuestResponse(**quest) if quest.selected_approach is None else quest for quest in quests]
+    return [
+        SecretQuestResponse(**quest) if quest["selected_approach"] is None else QuestResponse(**quest)
+        for quest in quests
+    ]
 
 
 @router.get("/{quest_id}")
 async def get_quest(quest: QuestResponse = Depends(fetch_quest_from_path_id)):
-    if not quest["selected_approach"]:
+    if not quest.selected_approach:
         # if quest not finished, hide important game data
-        return SecretQuestResponse(**quest)
+        return SecretQuestResponse(**quest.model_dump())
     return quest
 
 
