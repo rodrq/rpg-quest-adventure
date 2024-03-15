@@ -25,7 +25,7 @@ class UserBase(BaseModel):
     created_characters: List[str] | None = None
 
 
-class UserInDb(UserBase):
+class UserSchema(UserBase):
     hashed_password: bytes
     created_at: datetime
     updated_at: Optional[datetime] = None

@@ -4,7 +4,7 @@ from fastapi.responses import Response
 from src.auth import service
 from src.auth.dependencies import valid_username_create
 from src.auth.jwt import parse_jwt_user_data
-from src.auth.schemas import UserBase, UserForm, UserInDb
+from src.auth.schemas import UserBase, UserForm
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 

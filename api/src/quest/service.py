@@ -14,10 +14,10 @@ from src.database import execute, fetch_all, fetch_one
 from src.quest.exceptions import QuestBelongsToAnotherCharacter, QuestNotFound
 from src.quest.llm import create_quest_prompt, prompt_maps_dict
 from src.quest.models import Quest
-from src.quest.schemas import QuestResponse
+from src.quest.schemas import QuestBase, QuestSchema
 
 
-async def generate_quest(character: CharacterSchema) -> Quest:
+async def generate_quest(character: CharacterSchema) -> QuestBase | None:
     genai.configure(api_key=settings.GEMINI_API_KEY)
 
     model = genai.GenerativeModel("gemini-pro")
@@ -44,7 +44,7 @@ async def generate_quest(character: CharacterSchema) -> Quest:
     response = await loop.run_in_executor(executor, generate_content_sync)
     print(response.text)
 
-    # LLMs sometimes generate markdown template, or add some unnecesary comma so we fix.
+    # LLMs sometimes generates markdown template or adds some unnecesary comma so we fix.
     decoded_result = json_repair.repair_json(response.text, skip_json_loads=True)
     result = orjson.loads(decoded_result)
     insert_query = (
@@ -57,12 +57,19 @@ async def generate_quest(character: CharacterSchema) -> Quest:
         )
         .returning(Quest)
     )
-    return await fetch_one(insert_query)
+    created_quest = await fetch_one(insert_query)
+    if not created_quest:
+        return None
+    return QuestBase(**created_quest)
 
 
-async def get_all_quests(selected_character: CharacterSchema) -> List[QuestResponse]:
+async def get_all_quests(selected_character: CharacterSchema) -> List[QuestBase | QuestSchema]:
     select_query = select(Quest).where(Quest.character_name == selected_character.name)
-    return await fetch_all(select_query)
+    quests = await fetch_all(select_query)
+    # if quest not finished, hide important game data
+    return [
+        QuestBase(**quest) if quest["selected_approach"] is None else QuestSchema(**quest) for quest in quests
+    ]
 
 
 async def after_quest_creation_updates(character_name: str, quest) -> None:
@@ -80,28 +87,27 @@ async def after_quest_creation_updates(character_name: str, quest) -> None:
     return await execute(update_query)
 
 
-async def get_quest(quest_id) -> QuestResponse | None:
+async def get_quest(quest_id) -> QuestSchema | None:
     select_query = select(Quest).where(Quest.id == quest_id)
     quest = await fetch_one(select_query)
-    return QuestResponse(**quest)
+    if quest is None:
+        raise QuestNotFound()
+    return QuestSchema(**quest)
 
 
-async def get_selected_character_quest(
-    selected_character: CharacterSchema, quest_id: int
-) -> QuestResponse | None:
-    quest: QuestResponse = await get_quest(quest_id)
+async def get_selected_character_quest(selected_character: CharacterSchema, quest_id: int) -> QuestSchema:
+    quest: QuestSchema = await get_quest(quest_id)
     if not quest:
         raise QuestNotFound()
 
     if quest.character_name != selected_character.name:
         raise QuestBelongsToAnotherCharacter()
-
     return quest
 
 
 async def update_game_variables(
-    character: CharacterSchema, character_updates: dict, quest: QuestResponse, quest_updates: dict
-):
+    character: CharacterSchema, character_updates: dict, quest: QuestSchema, quest_updates: dict
+) -> dict:
     character_query = (
         update(Character).where(Character.name == quest.character_name).values(character_updates)
     )
@@ -112,7 +118,7 @@ async def update_game_variables(
     return {"message": "character states updated"}
 
 
-async def orphan_quests(character_name: str):
+async def orphan_quests(character_name: str) -> dict:
     orphan_quests = update(Quest).where(Quest.character_name == character_name).values(character_name=None)
     await execute(orphan_quests)
     return {"status": 200, "message": "success"}

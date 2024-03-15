@@ -4,10 +4,10 @@ from src.character.models import Character
 from src.character.schemas import CharacterSchema
 from src.quest import llm, service
 from src.quest.exceptions import InvalidApproachChoice
-from src.quest.schemas import Approach, QuestResponse
+from src.quest.schemas import ApproachSchema, QuestSchema
 
 
-async def roll_approach(approach_number, quest: QuestResponse, character: CharacterSchema):
+async def roll_approach(approach_number, quest: QuestSchema, character: CharacterSchema):
     quest_approaches = {
         1: quest.approaches.approach_1,
         2: quest.approaches.approach_2,
@@ -30,7 +30,7 @@ async def roll_approach(approach_number, quest: QuestResponse, character: Charac
 
 
 async def success_roll(
-    character: CharacterSchema, quest: QuestResponse, chosen_approach: Approach, approach_number: int
+    character: CharacterSchema, quest: QuestSchema, chosen_approach: ApproachSchema, approach_number: int
 ):
     character_updates = {
         "valor_points": Character.valor_points + (100 - chosen_approach.chance_of_success),
@@ -51,7 +51,7 @@ async def success_roll(
 
 
 async def failure_roll(
-    character: CharacterSchema, quest: QuestResponse, chosen_approach: Approach, approach_number: int
+    character: CharacterSchema, quest: QuestSchema, chosen_approach: ApproachSchema, approach_number: int
 ):
     character_updates = {
         "valor_points": Character.valor_points + (100 - chosen_approach.chance_of_success),

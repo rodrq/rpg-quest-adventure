@@ -9,7 +9,7 @@ from src.quest.exceptions import (
     CharacterStateWinner,
     LastQuestNotCompleted,
 )
-from src.quest.schemas import QuestResponse
+from src.quest.schemas import QuestSchema
 
 
 async def valid_quest_post(
@@ -32,5 +32,5 @@ async def valid_quest_post(
 
 async def fetch_quest_from_path_id(
     selected_character: CharacterSchema = Depends(get_selected_character), quest_id: int = Path()
-) -> QuestResponse:
+) -> QuestSchema:
     return await service.get_selected_character_quest(selected_character, quest_id)

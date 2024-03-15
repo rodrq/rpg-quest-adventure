@@ -4,39 +4,39 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class SecretApproach(BaseModel):
+class ApproachBase(BaseModel):
     choice_description: str
 
 
-class Approach(BaseModel):
+class ApproachSchema(BaseModel):
     choice_description: str
     success_description: str
     failure_description: str
     chance_of_success: int
 
 
-class SecretApproaches(BaseModel):
-    approach_1: SecretApproach
-    approach_2: SecretApproach
-    approach_3: SecretApproach
+class ApproachesBase(BaseModel):
+    approach_1: ApproachBase
+    approach_2: ApproachBase
+    approach_3: ApproachBase
 
 
 class Approaches(BaseModel):
-    approach_1: Approach
-    approach_2: Approach
-    approach_3: Approach
+    approach_1: ApproachSchema
+    approach_2: ApproachSchema
+    approach_3: ApproachSchema
 
 
-class SecretQuestResponse(BaseModel):
+class QuestBase(BaseModel):
     id: int
     title: str
     description: str
-    approaches: SecretApproaches
+    approaches: ApproachesBase
     character_name: str
     selected_approach: Optional[int]
 
 
-class QuestResponse(SecretQuestResponse):
+class QuestSchema(QuestBase):
     approaches: Approaches
     survived: Optional[bool]
     created_at: datetime

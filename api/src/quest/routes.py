@@ -9,7 +9,7 @@ from src.quest.dependencies import (
     valid_quest_post,
 )
 from src.quest.exceptions import CharacterStateDead, CharacterStateWinner, QuestAlreadyCompleted
-from src.quest.schemas import QuestResponse, SecretQuestResponse
+from src.quest.schemas import QuestBase, QuestSchema
 
 router = APIRouter(prefix="/quest", tags=["Quest endpoints"])
 
@@ -19,31 +19,26 @@ async def create_quest(character: CharacterSchema = Depends(valid_quest_post)):
     quest = await service.generate_quest(character)
     # updates characters completed_last_quest to False.
     await character_service.update_character_multiple(character.name, {"completed_last_quest": False})
-    return SecretQuestResponse(**quest)
+    return quest
 
 
 @router.get("/")
 async def get_quests(selected_character: CharacterSchema = Depends(get_selected_character)):
-    quests = await service.get_all_quests(selected_character)
-    # if quest not finished, hide important game data
-    return [
-        SecretQuestResponse(**quest) if quest["selected_approach"] is None else QuestResponse(**quest)
-        for quest in quests
-    ]
+    return await service.get_all_quests(selected_character)
 
 
 @router.get("/{quest_id}")
-async def get_quest(quest: QuestResponse = Depends(fetch_quest_from_path_id)):
+async def get_quest(quest: QuestSchema = Depends(fetch_quest_from_path_id)):
     if not quest.selected_approach:
         # if quest not finished, hide important game data
-        return SecretQuestResponse(**quest.model_dump())
+        return QuestBase(**quest.model_dump())
     return quest
 
 
 @router.post("/play/{quest_id}/{approach_number}")
 async def play_quest_approach(
     approach_number: int,
-    quest: QuestResponse = Depends(fetch_quest_from_path_id),
+    quest: QuestSchema = Depends(fetch_quest_from_path_id),
     character: CharacterSchema = Depends(get_selected_character),
 ):
     if character.state == "dead":
