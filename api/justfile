@@ -1,8 +1,26 @@
 default:
   just --list
 
+up:
+  docker-compose up -d
+
+kill:
+  docker-compose kill
+
+build:
+  docker-compose up -d --build
+
+ps:
+  docker-compose ps
+
 exec *args:
   docker-compose exec backend {{args}}
+
+mm *args:
+  docker compose exec backend alembic revision --autogenerate -m "{{args}}"
+
+migrate:
+  docker compose exec backend alembic upgrade head
 
 reset_dbbackup:
   docker compose exec database scripts/backup

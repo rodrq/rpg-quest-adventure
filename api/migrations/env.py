@@ -4,11 +4,12 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from src import database
 from src.auth.models import User  # noqa: F401
 from src.character.models import Character  # noqa: F401
+from src.config import settings
 from src.quest.models import Quest  # noqa: F401
 
 # this is the Alembic Config object, which provides
@@ -45,7 +46,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = str(settings.DB_URL)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -69,17 +70,17 @@ async def run_async_migrations() -> None:
     and associate a connection with the context.
 
     """
+    # Create an AsyncEngine using the database URL
+    connectable = create_async_engine(url=str(settings.DB_URL))
 
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
-
-    async with connectable.connect() as connection:
-        await connection.run_sync(do_run_migrations)
-
-    await connectable.dispose()
+    try:
+        # Establish a connection to the database
+        async with connectable.connect() as connection:
+            # Run synchronous migrations within the async context
+            await connection.run_sync(do_run_migrations)
+    finally:
+        # Dispose of the engine after use
+        await connectable.dispose()
 
 
 def run_migrations_online() -> None:

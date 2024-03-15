@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   backend:
     container_name: rpg_quest_backend
     image: backend
@@ -15,6 +16,7 @@ services:
       - "8000:8000"
     depends_on:
       - database
+      
   database:
     container_name: rpg_quest_db
     hostname: rpg
