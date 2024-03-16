@@ -75,6 +75,7 @@ async def reset_character(character: CharacterSchema):
         "valor_points": 0,
         "map_level": 1,
         "times_reset": Character.times_reset + 1,
+        "completed_last_quest": True,
     }
 
     await update_character_multiple(character.name, factory_settings_character)
