@@ -24,16 +24,6 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-def get_conn_str():
-    return f"""
-    dbname={settings.POSTGRES_DB}
-    user={settings.POSTGRES_USER}
-    password={settings.POSTGRES_PASSWORD}
-    host={settings.POSTGRES_HOST}
-    port={settings.POSTGRES_PORT}
-    """
-
-
 app_configs = {
     "title": "RPG Quest API",
     "openapi_url": "/docs",

@@ -12,7 +12,7 @@ from src.character.schemas import CharacterBase, CharacterSchema
 router = APIRouter(prefix="/character", tags=["Character endpoints"])
 
 
-@router.post("/")
+@router.post("/", status_code=201)
 async def create_character(
     character_form: CharacterBase = Depends(valid_character_create),
     user_id: int = Depends(jwt.parse_jwt_user_data),
