@@ -14,11 +14,11 @@ class Settings(BaseSettings):
     JWT_SECRET: str
 
     DB_URL: PostgresDsn
-    POSTGRES_DB: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int
+    DB_NAME: str
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_HOST: str
+    DB_PORT: int
 
 
 settings = Settings()
@@ -34,8 +34,12 @@ def get_conn_str():
     """
 
 
-app_configs = {"title": "RPG Quest API"}
+app_configs = {
+    "title": "RPG Quest API",
+    "openapi_url": "/docs",
+}
+
 
 if settings.ENVIRONMENT != "local":
     # If not on local hides /docs
-    app_configs["openapi_url"] = None
+    app_configs["openapi_url"] = None  # type: ignore
