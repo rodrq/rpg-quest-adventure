@@ -12,7 +12,7 @@ from src.quest.exceptions import (
 from src.quest.schemas import QuestSchema
 
 
-async def valid_quest_post(
+async def get_valid_character_for_quest(
     selected_character: CharacterSchema = Depends(get_selected_character)
 ) -> CharacterSchema:
     if not selected_character:
@@ -30,7 +30,7 @@ async def valid_quest_post(
     return selected_character
 
 
-async def fetch_quest_from_path_id(
+async def get_quest_from_id_in_path(
     selected_character: CharacterSchema = Depends(get_selected_character), quest_id: int = Path()
 ) -> QuestSchema:
     return await service.get_selected_character_quest(selected_character, quest_id)

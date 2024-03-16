@@ -36,3 +36,4 @@ class ErrorCode:
     INVALID_CHOSEN_APPROACH = "Invalid approach number"
     NOT_YOUR_SELECTED_CHARACTER = "Not your selected character"
     QUEST_ALREADY_COMPLETED = "This quest is already completed"
+    QUEST_UNAUTHORIZED = "You are not authorized to play this quest"
