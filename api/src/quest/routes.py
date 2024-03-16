@@ -55,3 +55,8 @@ async def play_quest_approach(
     if isinstance(quest.survived, bool):
         raise QuestAlreadyCompleted
     return await game.roll_approach(approach_number, quest, character)
+
+
+@router.get("/journey/{character_name}")
+async def see_journey(character_name: str):
+    return await service.get_character_journey(character_name)

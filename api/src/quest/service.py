@@ -109,3 +109,20 @@ async def orphan_quests(character_name: str) -> dict:
     orphan_quests = update(Quest).where(Quest.character_name == character_name).values(character_name=None)
     await execute(orphan_quests)
     return {"status": 200, "message": "success"}
+
+
+async def get_character_journey(character_name) -> List[QuestSummary]:
+    select_query = select(Quest).where(Quest.character_name == character_name)
+    quests = await fetch_all(select_query)
+
+    summarized_quests = [
+        QuestSummary(
+            title=quest["title"],
+            description=quest["description"],
+            action=quest["approaches"][f"approach_{quest['selected_approach']}"]["choice_description"],
+            consequence=quest["approaches"][f"approach_{quest['selected_approach']}"]["success_description"],
+            survived=quest["survived"],
+        )
+        for quest in quests
+    ]
+    return summarized_quests

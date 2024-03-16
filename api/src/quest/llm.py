@@ -1,3 +1,46 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from typing import Tuple
+
+import google.generativeai as genai
+from google.generativeai.types import GenerateContentResponse
+
+from src.character.schemas import CharacterSchema
+from src.config import settings
+
+genai.configure(api_key=settings.GEMINI_API_KEY)
+
+model = genai.GenerativeModel("gemini-pro")
+
+
+async def generate_quest(character: CharacterSchema) -> GenerateContentResponse:
+    def generate_quest_sync():
+        system_prompt, user_prompt = get_quest_params(character)
+        return model.generate_content(
+            f"""System role: {system_prompt}.
+
+                User role: {user_prompt}. """,
+            generation_config=genai.types.GenerationConfig(
+                candidate_count=1,
+                temperature=1.0,
+            ),
+        )
+
+    # execute llm in separate thread to not block I/O because google gemini doesn't have async yet
+    loop = asyncio.get_event_loop()
+    executor = ThreadPoolExecutor()
+    return await loop.run_in_executor(executor, generate_quest_sync)
+
+
+def get_quest_params(character: CharacterSchema) -> Tuple[str, str]:
+    quest_map = prompt_maps_dict[character.map_level]
+
+    system_prompt, user_prompt = create_quest_prompt(
+        character.name, character.class_, quest_map, character.virtue, character.flaw
+    )
+    return system_prompt, user_prompt
+
+
 def create_quest_prompt(name: str, class_: str, quest_map: str, virtue: str, flaw: str):
     system_prompt = """Respond with a string to be parsed to JSON, strings enclosed with double quotes and
     without any markdown formatting (just plain text.).
