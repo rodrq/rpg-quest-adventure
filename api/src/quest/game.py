@@ -39,7 +39,7 @@ async def success_roll(
     }
 
     # check if next map_level greater than max numbers of maps
-    if character.map_level + 1 >= len(llm.prompt_maps_dict):
+    if character.map_level + 1 >= len(llm.prompt_maps_dict + 1):
         character_updates["state"] = "winner"
 
     quest_updates = {
