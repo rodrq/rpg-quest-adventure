@@ -26,9 +26,5 @@ class CharacterSchema(CharacterBase):
     map_level: int
     times_reset: int
     completed_last_quest: bool
-
+    created_quests: List[dict[str, Any]] | None = None
     model_config = ConfigDict(use_enum_values=True)
-
-
-class CharacterWithQuests(CharacterSchema):
-    quests: List[dict[str, Any]] | None = None

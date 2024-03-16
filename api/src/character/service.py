@@ -27,7 +27,7 @@ async def create_character(character_form: CharacterBase, user_id: int) -> Chara
     character = await fetch_one(insert_query)
     # set just created character as user's selected_character
     await auth_service.update_value(user_id, "selected_character", character["name"])
-    return CharacterSchema(**character)
+    return CharacterSchema.model_validate(character)
 
 
 async def add_to_users_character_list(character_name, user_id):
@@ -42,7 +42,7 @@ async def get_all_user_characters(user_id: int):
     return await fetch_all(select_query)
 
 
-async def get_character(name: str) -> Character:
+async def get_character(name: str) -> CharacterSchema:
     select_query = select(Character).where(Character.name == name)
 
     return await fetch_one(select_query)
@@ -55,13 +55,23 @@ async def get_character_by_user_id(character_name: str, user_id: int) -> Charact
     return await fetch_one(select_query)
 
 
-async def get_character_joined_rel_data(character_name: str, user_id: int) -> List[dict]:
+async def after_quest_update_character_data(character_name: str, user_id: int) -> None:
     select_query = (
         select(Character)
         .options(joinedload(Character.quests))
         .where((Character.name == character_name) & (Character.user_id == user_id))
     )
-    return await fetch_all(select_query)
+    character_with_quests = await fetch_all(select_query)
+    character = CharacterSchema.model_validate(character_with_quests[0])
+    quests = [
+        {"title": quest["title"], "quest_id": quest["id"], "survived": quest["survived"]}
+        for quest in character_with_quests
+    ]
+    character.created_quests = quests
+    character.completed_last_quest = False
+    update_query = update(Character).where(Character.name == character_name).values(character.model_dump())
+    await execute(update_query)
+    return None
 
 
 async def delete_character(character_name: str):

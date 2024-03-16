@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, func
+from sqlalchemy import ARRAY, Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
 
 from src.character.enum import CharacterClassEnum, CharacterFlawEnum, CharacterStateEnum, CharacterVirtueEnum
@@ -20,6 +20,7 @@ class Character(Base):
     times_reset = Column(Integer, default=0)
 
     quests = relationship("Quest", back_populates="character", cascade="all")
+    created_quests = Column(ARRAY(Integer), default=None)
 
     # tracker to check if last generated quest was completed. Default True so you can generate the first one
     completed_last_quest = Column(Boolean, default=True)
