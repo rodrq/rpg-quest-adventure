@@ -4,6 +4,9 @@ default:
 up:
   docker-compose up -d
 
+uplogs:
+  docker-compose up
+
 kill:
   docker-compose kill
 
