@@ -22,7 +22,7 @@ class UserBase(BaseModel):
     username: str
     is_admin: bool
     selected_character: Optional[str] = None
-    created_characters: List[str] | None = None
+    created_characters: Optional[List[Optional[str]]] = None
 
 
 class UserSchema(UserBase):

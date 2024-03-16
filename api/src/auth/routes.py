@@ -19,16 +19,14 @@ async def create_user(response: Response, user_form: UserForm = Depends(valid_us
 @router.post("/login")
 async def login(auth_data: UserForm, response: Response) -> UserBase:
     user = await service.authenticate_user(auth_data)
+    user = UserBase.model_validate(user)
     await service.set_cookie_handler(user, response)
     return user
 
 
 @router.get("/user/me")
-async def get_user_joined_data(user_id: int = Depends(parse_jwt_user_data)) -> UserBase:
-    # Joined load all characters with FK user_id.
-    user = await service.get_user_rel_joined_data(user_id)
-    created_characters = [char["name"] for char in user if char["name"] is not None]
-    return UserBase(**user[0], created_characters=created_characters)
+async def get_user_data(user_id: int = Depends(parse_jwt_user_data)) -> UserBase:
+    return await service.get_user_by_id(user_id)
 
 
 @router.post("/logout")
