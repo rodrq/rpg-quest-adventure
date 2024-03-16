@@ -1,11 +1,10 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
-from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from alembic import context
 from src import database
 from src.auth.models import User  # noqa: F401
 from src.character.models import Character  # noqa: F401
@@ -32,6 +31,7 @@ target_metadata = database.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+DATABASE_URL = str(settings.DB_URL)
 
 
 def run_migrations_offline() -> None:
@@ -46,7 +46,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = str(settings.DB_URL)
+    url = DATABASE_URL
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -71,7 +71,7 @@ async def run_async_migrations() -> None:
 
     """
     # Create an AsyncEngine using the database URL
-    connectable = create_async_engine(url=str(settings.DB_URL))
+    connectable = create_async_engine(url=DATABASE_URL)
 
     try:
         # Establish a connection to the database

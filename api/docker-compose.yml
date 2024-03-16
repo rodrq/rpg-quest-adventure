@@ -19,7 +19,7 @@ services:
       
   database:
     container_name: rpg_quest_db
-    hostname: rpg
+    hostname: docker
     env_file:
     - .env.local
     image: library/postgres:16
