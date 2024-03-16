@@ -42,7 +42,6 @@ async def generate_quest(character: CharacterSchema) -> QuestBase | None:
     loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor()
     response = await loop.run_in_executor(executor, generate_content_sync)
-    print(response.text)
 
     # LLMs sometimes generates markdown template or adds some unnecesary comma so we fix.
     decoded_result = json_repair.repair_json(response.text, skip_json_loads=True)
@@ -72,21 +71,6 @@ async def get_all_quests(selected_character: CharacterSchema) -> List[QuestBase 
     ]
 
 
-async def after_quest_creation_updates(character_name: str, quest) -> None:
-    """Updates Character.completed_last_quest to False since we just created a quest.
-    Also updates Character.quests list of fks quest ids"""
-    print(character_name, quest)
-    update_query = (
-        update(Character)
-        .where(Character.name == character_name)
-        .values(
-            completed_last_quest=False,
-            quests=Character.quests + [quest["id"]],
-        )
-    )
-    return await execute(update_query)
-
-
 async def get_quest(quest_id) -> QuestSchema | None:
     select_query = select(Quest).where(Quest.id == quest_id)
     quest = await fetch_one(select_query)
@@ -96,7 +80,7 @@ async def get_quest(quest_id) -> QuestSchema | None:
 
 
 async def get_selected_character_quest(selected_character: CharacterSchema, quest_id: int) -> QuestSchema:
-    quest: QuestSchema = await get_quest(quest_id)
+    quest = await get_quest(quest_id)
     if not quest:
         raise QuestNotFound()
 
@@ -111,8 +95,11 @@ async def update_game_variables(
     character_query = (
         update(Character).where(Character.name == quest.character_name).values(character_updates)
     )
-    quest_query = update(Quest).where(Quest.character_name == character.name).values(quest_updates)
-
+    quest_query = (
+        update(Quest)
+        .where((Quest.character_name == character.name) & (Quest.id == quest.id))
+        .values(quest_updates)
+    )
     await execute(character_query)
     await execute(quest_query)
     return {"message": "character states updated"}

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 
+from src.auth import jwt
 from src.character import service as character_service
 from src.character.dependencies import get_selected_character
 from src.character.schemas import CharacterSchema
@@ -15,10 +16,14 @@ router = APIRouter(prefix="/quest", tags=["Quest endpoints"])
 
 
 @router.post("/create")
-async def create_quest(character: CharacterSchema = Depends(valid_quest_post)):
+async def create_quest(
+    character: CharacterSchema = Depends(valid_quest_post), user_id: int = Depends(jwt.parse_jwt_user_data)
+):
     quest = await service.generate_quest(character)
-    # updates characters completed_last_quest to False.
-    await character_service.update_character_multiple(character.name, {"completed_last_quest": False})
+
+    """Updates Character.completed_last_quest to False since we just created a quest.
+    Updates characters created_quests with the new quest data."""
+    await character_service.after_quest_update_character_data(character.name, user_id)  # type: ignore
     return quest
 
 
@@ -45,6 +50,7 @@ async def play_quest_approach(
         raise CharacterStateDead
     if character.state == "winner":
         raise CharacterStateWinner
+    # true or false means quest already done (default is None)
     if isinstance(quest.survived, bool):
         raise QuestAlreadyCompleted
     return await game.roll_approach(approach_number, quest, character)

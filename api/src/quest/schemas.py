@@ -32,7 +32,7 @@ class QuestBase(BaseModel):
     title: str
     description: str
     approaches: ApproachesBase
-    character_name: str
+    character_name: Optional[str] = None
     selected_approach: Optional[int]
 
 
