@@ -37,6 +37,14 @@ class QuestBase(BaseModel):
 
 
 class QuestSchema(QuestBase):
-    approaches: Approaches
+    approaches: Approaches  # type: ignore
     survived: Optional[bool]
     created_at: datetime
+
+
+class QuestSummary(BaseModel):
+    title: str
+    description: str
+    action: str
+    consequence: str
+    survived: bool

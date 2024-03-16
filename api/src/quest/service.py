@@ -1,48 +1,20 @@
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
-import google.generativeai as genai
 import json_repair
 import orjson
 from sqlalchemy import insert, select, update
 
 from src.character.models import Character
 from src.character.schemas import CharacterSchema
-from src.config import settings
 from src.database import execute, fetch_all, fetch_one
-from src.quest.exceptions import QuestBelongsToAnotherCharacter, QuestNotFound
-from src.quest.llm import create_quest_prompt, prompt_maps_dict
+from src.quest import llm
+from src.quest.exceptions import QuestNotFound, QuestUnauthorized
 from src.quest.models import Quest
-from src.quest.schemas import QuestBase, QuestSchema
+from src.quest.schemas import QuestBase, QuestSchema, QuestSummary
 
 
 async def generate_quest(character: CharacterSchema) -> QuestBase | None:
-    genai.configure(api_key=settings.GEMINI_API_KEY)
-
-    model = genai.GenerativeModel("gemini-pro")
-
-    quest_map = prompt_maps_dict[character.map_level]
-
-    system_prompt, user_prompt = create_quest_prompt(
-        character.name, character.class_, quest_map, character.virtue, character.flaw
-    )
-
-    def generate_content_sync():
-        return model.generate_content(
-            f"""System role: {system_prompt}.
-                User role: {user_prompt}. """,
-            generation_config=genai.types.GenerationConfig(
-                candidate_count=1,
-                temperature=1.0,
-            ),
-        )
-
-    # execute llm in separate thread to not block I/O
-    loop = asyncio.get_event_loop()
-    executor = ThreadPoolExecutor()
-    response = await loop.run_in_executor(executor, generate_content_sync)
-
+    response = await llm.generate_quest(character)
     # LLMs sometimes generates markdown template or adds some unnecesary comma so we fix.
     decoded_result = json_repair.repair_json(response.text, skip_json_loads=True)
     result = orjson.loads(decoded_result)
@@ -59,6 +31,7 @@ async def generate_quest(character: CharacterSchema) -> QuestBase | None:
     created_quest = await fetch_one(insert_query)
     if not created_quest:
         return None
+    # since quest is not finished, hide important game data
     return QuestBase(**created_quest)
 
 
@@ -75,7 +48,7 @@ async def get_quest(quest_id) -> QuestSchema | None:
     select_query = select(Quest).where(Quest.id == quest_id)
     quest = await fetch_one(select_query)
     if quest is None:
-        raise QuestNotFound()
+        raise QuestUnauthorized()
     return QuestSchema(**quest)
 
 
@@ -85,7 +58,7 @@ async def get_selected_character_quest(selected_character: CharacterSchema, ques
         raise QuestNotFound()
 
     if quest.character_name != selected_character.name:
-        raise QuestBelongsToAnotherCharacter()
+        raise QuestUnauthorized()
     return quest
 
 
