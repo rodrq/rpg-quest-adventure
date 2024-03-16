@@ -1,22 +1,10 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from psycopg_pool import AsyncConnectionPool
 
-from src.config import app_configs, get_conn_str, settings
+from src.config import app_configs, settings
 from src.router import router
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.async_pool = AsyncConnectionPool(conninfo=get_conn_str())
-    yield
-    await app.async_pool.close()
-
-
-app = FastAPI(**app_configs, lifespan=lifespan)
-
+app = FastAPI(**app_configs)  # type: ignore
 app.include_router(router)
 
 app.add_middleware(
